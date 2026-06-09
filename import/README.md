@@ -2,6 +2,34 @@
 
 Uní el Excel de precios con las fotos del grupo y cargá todo de una vez en Medusa.
 
+## Modo rápido: export de WhatsApp (recomendado)
+
+Si exportaste el chat con el `.txt` y las fotos `IMG-*.jpg` (como en `apps/storefront/src/imgwhatsap/`):
+
+```bash
+# 1. Asocia automáticamente foto → nombre desde el chat
+npm run prepare:whatsapp
+
+# 2. (Opcional) Poné tu Excel en import/precios.xlsx y repetí el paso 1 para cruzar precios
+
+# 3. Vista previa
+IMPORT_DRY_RUN=true npm run import:catalog
+
+# 4. Cargar en Medusa
+npm run import:catalog
+```
+
+El parser lee el patrón de WhatsApp:
+
+```
+… IMG-20260604-WA0075.jpg (archivo adjunto)
+Short jean (cuerina)
+```
+
+Cada línea con `(archivo adjunto)` toma el **nombre de la línea siguiente**.
+
+---
+
 ## 1. Preparar el Excel
 
 Guardá tu archivo como **`import/precios.xlsx`** o exportalo a **`import/precios.csv`**.

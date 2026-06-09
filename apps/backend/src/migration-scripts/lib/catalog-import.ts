@@ -191,6 +191,235 @@ export function findPhoto(
   return contains ?? null
 }
 
+export type WhatsAppPhotoEntry = {
+  file: string
+  nombre: string
+  chatLine: number
+}
+
+const WA_ATTACHMENT_RE =
+  /(IMG-\d{8}-WA\d{4}\.[a-z0-9]+)\s*\(archivo adjunto\)/i
+const WA_DATE_LINE_RE = /^\d{1,2}\/\d{1,2}\/\d{4}/
+
+function isChatMetaLine(line: string) {
+  const trimmed = line.trim()
+  return (
+    !trimmed ||
+    trimmed.includes("Se eliminó este mensaje") ||
+    trimmed.includes("cifrados de extremo a extremo") ||
+    trimmed.includes("creó el grupo") ||
+    trimmed.includes("te añadió") ||
+    trimmed.includes("Se te añadió")
+  )
+}
+
+function extractNameAfterAttachment(line: string) {
+  const parts = line.split(/\(archivo adjunto\)/i)
+  const after = parts[1]?.trim() ?? ""
+  if (!after || WA_DATE_LINE_RE.test(after)) return ""
+  return after
+}
+
+function readNameFromFollowingLines(lines: string[], startIndex: number) {
+  for (let j = startIndex + 1; j < lines.length; j++) {
+    const next = lines[j].trim()
+    if (!next || isChatMetaLine(next)) continue
+    if (WA_DATE_LINE_RE.test(next) || WA_ATTACHMENT_RE.test(next)) break
+    const colonIdx = next.indexOf(": ")
+    const candidate =
+      colonIdx >= 0 && WA_DATE_LINE_RE.test(next.slice(0, colonIdx + 2))
+        ? next.slice(colonIdx + 2).trim()
+        : next
+    if (candidate && !WA_ATTACHMENT_RE.test(candidate)) return candidate
+  }
+  return ""
+}
+
+export function parseWhatsAppChat(content: string): WhatsAppPhotoEntry[] {
+  const lines = content.split(/\r?\n/)
+  const entries: WhatsAppPhotoEntry[] = []
+
+  lines.forEach((line, index) => {
+    const match = line.match(WA_ATTACHMENT_RE)
+    if (!match) return
+
+    const file = match[1]
+    const inlineName = extractNameAfterAttachment(line)
+    const nombre =
+      inlineName || readNameFromFollowingLines(lines, index) || ""
+
+    entries.push({
+      file,
+      nombre: nombre.trim(),
+      chatLine: index + 1,
+    })
+  })
+
+  return entries
+}
+
+export function findWhatsAppChatFile(dir: string) {
+  if (!fs.existsSync(dir)) return null
+
+  const chat = fs
+    .readdirSync(dir)
+    .find(
+      (file) =>
+        file.toLowerCase().endsWith(".txt") &&
+        file.toLowerCase().includes("chat")
+    )
+
+  return chat ? path.join(dir, chat) : null
+}
+
+export type PriceRow = {
+  nombre: string
+  precio: number
+  categoria?: string
+  raw: Record<string, string>
+}
+
+export function readPriceList(filePath: string): PriceRow[] {
+  const ext = path.extname(filePath).toLowerCase()
+  const rawRows =
+    ext === ".csv" ? readRowsFromCsv(filePath) : readRowsFromXlsx(filePath)
+
+  const rows: PriceRow[] = []
+
+  for (const raw of rawRows) {
+    let nombre = ""
+    let precio: number | null = null
+    let categoria: string | undefined
+
+    for (const [header, value] of Object.entries(raw)) {
+      const field = HEADER_MAP[header]
+      if (field === "nombre" && value) nombre = value
+      if (field === "precio") precio = parsePrice(value)
+      if (field === "categoria" && value) categoria = value
+    }
+
+    if (!nombre || precio === null) continue
+    rows.push({ nombre, precio, categoria, raw })
+  }
+
+  return rows
+}
+
+function priceMatchScore(a: string, b: string) {
+  const left = normalizeKey(a)
+  const right = normalizeKey(b)
+  if (!left || !right) return 0
+  if (left === right) return 100
+  if (left.includes(right) || right.includes(left)) return 80
+
+  const leftTokens = new Set(left.split(" ").filter(Boolean))
+  const rightTokens = new Set(right.split(" ").filter(Boolean))
+  let shared = 0
+  leftTokens.forEach((token) => {
+    if (rightTokens.has(token)) shared += 1
+  })
+
+  if (!shared) return 0
+  return Math.round(
+    (shared / Math.max(leftTokens.size, rightTokens.size)) * 70
+  )
+}
+
+export function matchPriceForName(
+  nombre: string,
+  prices: PriceRow[]
+): PriceRow | null {
+  let best: PriceRow | null = null
+  let bestScore = 0
+
+  for (const row of prices) {
+    const score = priceMatchScore(nombre, row.nombre)
+    if (score > bestScore) {
+      bestScore = score
+      best = row
+    }
+  }
+
+  return bestScore >= 70 ? best : null
+}
+
+export function whatsAppEntriesToCatalog(
+  entries: WhatsAppPhotoEntry[],
+  photosDir: string,
+  prices: PriceRow[] = []
+): {
+  rows: Array<CatalogRow & { foto: string; sinPrecio?: boolean; sinFoto?: boolean }>
+  warnings: string[]
+} {
+  const photos = listPhotos(photosDir)
+  const photoSet = new Set(photos.map((p) => p.file.toLowerCase()))
+  const warnings: string[] = []
+  const rows: Array<
+    CatalogRow & { foto: string; sinPrecio?: boolean; sinFoto?: boolean }
+  > = []
+
+  const usedFiles = new Map<string, string>()
+
+  entries.forEach((entry, index) => {
+    const nombre = entry.nombre || `Producto ${entry.file}`
+    const hasPhoto = photoSet.has(entry.file.toLowerCase())
+
+    if (!entry.nombre) {
+      warnings.push(
+        `Línea ${entry.chatLine}: ${entry.file} sin nombre en el chat`
+      )
+    }
+
+    if (!hasPhoto) {
+      warnings.push(`Falta imagen en carpeta: ${entry.file}`)
+    }
+
+    if (usedFiles.has(entry.file)) {
+      warnings.push(
+        `Duplicado ${entry.file}: antes "${usedFiles.get(entry.file)}", ahora "${nombre}"`
+      )
+    }
+    usedFiles.set(entry.file, nombre)
+
+    const priceMatch = matchPriceForName(nombre, prices)
+
+    rows.push({
+      nombre,
+      precio: priceMatch?.precio ?? 0,
+      categoria: priceMatch?.categoria,
+      foto: entry.file,
+      talles: ["Único"],
+      colores: ["Único"],
+      rowNumber: index + 2,
+      sinPrecio: !priceMatch,
+      sinFoto: !hasPhoto,
+    })
+  })
+
+  return { rows, warnings }
+}
+
+export function writeCatalogCsv(
+  filePath: string,
+  rows: Array<{
+    nombre: string
+    precio: number | string
+    foto: string
+    categoria?: string
+  }>
+) {
+  const header = "nombre,precio,foto,categoria"
+  const body = rows.map((row) => {
+    const nombre = `"${row.nombre.replace(/"/g, '""')}"`
+    const precio = row.precio === 0 ? "" : String(row.precio)
+    const categoria = row.categoria ? `"${row.categoria.replace(/"/g, '""')}"` : ""
+    return `${nombre},${precio},${row.foto},${categoria}`
+  })
+
+  fs.mkdirSync(path.dirname(filePath), { recursive: true })
+  fs.writeFileSync(filePath, [header, ...body].join("\n"), "utf8")
+}
+
 export type MatchPreview = {
   row: CatalogRow
   photo: ReturnType<typeof listPhotos>[number] | null

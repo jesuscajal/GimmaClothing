@@ -22,7 +22,9 @@
     "db:migrate": "npm run db:migrate -w @dtc/backend",
     "db:setup": "npm run db:setup -w @dtc/backend",
     "seed:argentina": "npm run seed:argentina -w @dtc/backend",
-    "import:catalog": "npm run import:catalog -w @dtc/backend"
+    "import:catalog": "npm run import:catalog -w @dtc/backend",
+    "prepare:whatsapp": "node import/prepare-whatsapp.mjs",
+    "prepare:whatsapp:medusa": "npm run prepare:whatsapp -w @dtc/backend"
   },
   "pnpm": {
     "overrides": {
