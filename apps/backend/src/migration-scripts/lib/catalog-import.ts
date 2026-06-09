@@ -85,6 +85,13 @@ export function slugify(value: string) {
   return normalizeKey(value).replace(/\s+/g, "-")
 }
 
+/** Limpia comillas del Excel/chat en nombres de categoría/marca. */
+export function normalizeCategoryName(value: string | undefined): string | undefined {
+  if (!value) return undefined
+  const cleaned = value.replace(/^["']+|["']+$/g, "").trim()
+  return cleaned || undefined
+}
+
 export function parsePrice(raw: unknown): number | null {
   if (raw === null || raw === undefined || raw === "") return null
   if (typeof raw === "number" && !Number.isNaN(raw)) {
@@ -186,7 +193,7 @@ export function readCatalog(filePath: string): CatalogRow[] {
     rows.push({
       nombre: mapped.nombre,
       precio: mapped.precio ?? 0,
-      categoria: mapped.categoria,
+      categoria: normalizeCategoryName(mapped.categoria),
       descripcion: mapped.descripcion,
       foto: mapped.foto,
       talles,

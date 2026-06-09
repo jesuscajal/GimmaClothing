@@ -15,6 +15,7 @@ import {
   findPhoto,
   handleFromPhoto,
   listPhotos,
+  normalizeCategoryName,
   previewMatches,
   readCatalog,
 } from "./lib/catalog-import"
@@ -195,20 +196,21 @@ export default async function importCatalog({
     const unitPrice = row.precio > 0 ? row.precio : placeholderPrice
 
     let categoryId: string | undefined
-    if (row.categoria) {
-      const key = row.categoria.toLowerCase()
+    const categoria = normalizeCategoryName(row.categoria)
+    if (categoria) {
+      const key = categoria.toLowerCase()
       categoryId = categoryByName.get(key)
       if (!categoryId) {
         const { result } = await createProductCategoriesWorkflow(container).run({
           input: {
             product_categories: [
-              { name: row.categoria, is_active: true },
+              { name: categoria, is_active: true },
             ],
           },
         })
         categoryId = result[0].id
         categoryByName.set(key, categoryId)
-        logger.info(`Categoría creada: ${row.categoria}`)
+        logger.info(`Categoría creada: ${categoria}`)
       }
     }
 

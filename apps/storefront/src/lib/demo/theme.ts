@@ -1,16 +1,14 @@
 /**
- * Paleta Gimma Clothing
- * - Fondos: gris claro (#f5f5f5, #fafafa)
- * - Precios y títulos fuertes: negro
- * - Texto secundario: gris medio claro (#a3a3a3)
+ * Paleta Gimma — minimalista, blanco y beige cálido.
  */
 export const GIMMA = {
-  bg: "bg-neutral-100",
-  bgSoft: "bg-neutral-50",
+  bg: "bg-beige-50",
+  bgSoft: "bg-beige-100",
   bgCard: "bg-white",
   price: "text-black font-semibold",
-  title: "text-black",
-  muted: "text-neutral-400",
-  border: "border-neutral-200",
-  btn: "bg-black text-white hover:bg-neutral-800",
+  title: "text-black font-serif",
+  muted: "text-neutral-500",
+  border: "border-beige-200",
+  btn: "bg-beige-800 text-white hover:bg-beige-900",
+  btnSoft: "bg-beige-100 text-beige-800 hover:bg-beige-200",
 } as const

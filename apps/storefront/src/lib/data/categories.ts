@@ -2,10 +2,15 @@ import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
 import { getCacheOptions } from "./cookies"
 
-export const listCategories = async (query?: Record<string, unknown>) => {
-  const next = {
-    ...(await getCacheOptions("categories")),
-  }
+export const listCategories = async (
+  query?: Record<string, unknown>,
+  options?: { revalidate?: number }
+) => {
+  const cacheOptions = await getCacheOptions("categories")
+  const next =
+    options?.revalidate !== undefined
+      ? { ...cacheOptions, revalidate: options.revalidate }
+      : cacheOptions
 
   const limit = query?.limit || 100
 
@@ -20,7 +25,7 @@ export const listCategories = async (query?: Record<string, unknown>) => {
           ...query,
         },
         next,
-        cache: "force-cache",
+        cache: options?.revalidate === 0 ? "no-store" : "force-cache",
       }
     )
     .then(({ product_categories }) => product_categories)

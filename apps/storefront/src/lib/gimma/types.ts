@@ -9,6 +9,12 @@ export type GimmaCategory = {
   image?: string
 }
 
+export type GimmaVariant = {
+  id: string
+  size: string
+  color?: string
+}
+
 export type GimmaProduct = {
   id: string
   handle: string
@@ -22,6 +28,7 @@ export type GimmaProduct = {
   images: string[]
   sizes: string[]
   colors: { name: string; hex: string }[]
+  variants: GimmaVariant[]
   badge?: string
   inStock: boolean
 }

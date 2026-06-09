@@ -15,15 +15,37 @@ const CATEGORY_IMAGES: Record<string, string> = {
 const DEFAULT_IMAGE =
   "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&q=80"
 
+/** Quita comillas que vienen del Excel/WhatsApp en nombres de marca. */
+export function normalizeCategoryText(value: string): string {
+  return value.replace(/^["']+|["']+$/g, "").trim()
+}
+
 export function mapMedusaCategories(
   categories: HttpTypes.StoreProductCategory[]
 ): GimmaCategory[] {
   return categories
     .filter((c) => c.id && c.handle && !c.parent_category)
-    .map((c) => ({
-      id: c.id!,
-      handle: c.handle!,
-      label: c.name ?? c.handle!,
-      image: CATEGORY_IMAGES[c.handle!] ?? DEFAULT_IMAGE,
-    }))
+    .map((c) => {
+      const handle = normalizeCategoryText(c.handle!)
+      const label = normalizeCategoryText(c.name ?? c.handle!)
+      return {
+        id: c.id!,
+        handle,
+        label,
+        image: CATEGORY_IMAGES[handle] ?? DEFAULT_IMAGE,
+      }
+    })
+}
+
+/** Solo categorías que tienen al menos un producto visible en la tienda. */
+export function categoriesWithProducts(
+  categories: GimmaCategory[],
+  productCategoryHandles: Iterable<string | undefined>
+): GimmaCategory[] {
+  const handles = new Set(
+    [...productCategoryHandles].filter((h): h is string => Boolean(h))
+  )
+  return categories
+    .filter((c) => handles.has(c.handle))
+    .sort((a, b) => a.label.localeCompare(b.label, "es"))
 }

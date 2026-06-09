@@ -26,21 +26,21 @@ export default async function DemoProductPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <nav className="mb-8 text-sm text-neutral-400">
+      <nav className="mb-8 text-sm text-neutral-500">
         <Link href="/demo/inicio" className="hover:text-black">
           Inicio
         </Link>
-        <span className="mx-2">/</span>
+        <span className="mx-2 text-beige-300">/</span>
         <Link href="/demo/tienda" className="hover:text-black">
           Tienda
         </Link>
-        <span className="mx-2">/</span>
+        <span className="mx-2 text-beige-300">/</span>
         <span className="text-black">{product.title}</span>
       </nav>
 
-      <div className="grid gap-10 overflow-hidden rounded-3xl bg-white p-6 shadow-sm ring-1 ring-neutral-200/80 lg:grid-cols-2 lg:gap-16 lg:p-10">
+      <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
         <div className="flex flex-col gap-3">
-          <div className="aspect-[3/4] overflow-hidden rounded-2xl bg-neutral-100">
+          <div className="aspect-[3/4] overflow-hidden rounded-xl bg-beige-100">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={product.images[0]}
@@ -51,7 +51,10 @@ export default async function DemoProductPage({ params }: Props) {
           {product.images.length > 1 && (
             <div className="grid grid-cols-4 gap-2">
               {product.images.map((img, i) => (
-                <div key={i} className="aspect-square overflow-hidden rounded-xl bg-neutral-100">
+                <div
+                  key={i}
+                  className="aspect-square overflow-hidden rounded-lg bg-beige-100"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={img} alt="" className="h-full w-full object-cover" />
                 </div>
@@ -62,15 +65,15 @@ export default async function DemoProductPage({ params }: Props) {
 
         <div>
           {product.badge && (
-            <span className="text-xs font-semibold tracking-wide text-neutral-400 uppercase">
+            <span className="text-xs font-medium tracking-[0.15em] text-neutral-500 uppercase">
               {product.badge}
             </span>
           )}
-          <h1 className="mt-2 text-3xl font-semibold text-black">
+          <h1 className="mt-2 font-serif text-4xl font-normal text-black sm:text-5xl">
             {product.title}
           </h1>
           <div className="mt-4 flex items-center gap-3">
-            <span className="text-2xl font-semibold text-black">
+            <span className="font-serif text-2xl font-semibold text-black">
               {formatDemoPrice(product.price)}
             </span>
             {product.compareAt && (
@@ -79,27 +82,28 @@ export default async function DemoProductPage({ params }: Props) {
               </span>
             )}
           </div>
-          <p className="mt-6 text-neutral-400 leading-relaxed">
+          <p className="mt-6 leading-relaxed text-neutral-500">
             {product.description}
           </p>
 
-          <div className="mt-10 border-t border-neutral-200 pt-10">
+          <div className="mt-10 border-t border-beige-200 pt-10">
             <DemoProductActions product={product} />
           </div>
 
-          <div className="mt-8 rounded-2xl border border-neutral-200 bg-neutral-100 p-4 text-sm text-neutral-400">
-            Al finalizar, enviá tu pedido por <strong className="text-black">WhatsApp</strong> y te
-            confirmamos disponibilidad.
+          <div className="mt-8 rounded-xl border border-beige-200 bg-beige-50 p-4 text-sm text-neutral-500">
+            Al finalizar, enviá tu pedido por{" "}
+            <strong className="text-black">WhatsApp</strong> y te confirmamos
+            disponibilidad.
           </div>
         </div>
       </div>
 
       {related.length > 0 && (
-        <section className="mt-20 border-t border-neutral-200 pt-16">
-          <h2 className="text-lg font-semibold text-black">
+        <section className="mt-20 border-t border-beige-200 pt-16">
+          <h2 className="font-serif text-2xl text-black">
             También te puede gustar
           </h2>
-          <div className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3">
+          <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-3 sm:gap-8">
             {related.map((p) => (
               <DemoProductCard key={p.id} product={p} />
             ))}

@@ -12,11 +12,14 @@ export const listProducts = async ({
   queryParams,
   countryCode,
   regionId,
+  revalidate,
 }: {
   pageParam?: number
   queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductListParams
   countryCode?: string
   regionId?: string
+  /** Segundos de revalidación ISR; 0 = sin caché. Por defecto: caché indefinida. */
+  revalidate?: number
 }): Promise<{
   response: { products: HttpTypes.StoreProduct[]; count: number }
   nextPage: number | null
@@ -49,9 +52,11 @@ export const listProducts = async ({
     ...(await getAuthHeaders()),
   }
 
-  const next = {
-    ...(await getCacheOptions("products")),
-  }
+  const cacheOptions = await getCacheOptions("products")
+  const next =
+    revalidate !== undefined
+      ? { ...cacheOptions, revalidate }
+      : cacheOptions
 
   return sdk.client
     .fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(
@@ -68,7 +73,7 @@ export const listProducts = async ({
         },
         headers,
         next,
-        cache: "force-cache",
+        cache: revalidate === 0 ? "no-store" : "force-cache",
       }
     )
     .then(({ products, count }) => {

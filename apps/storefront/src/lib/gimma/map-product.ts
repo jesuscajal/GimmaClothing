@@ -1,6 +1,8 @@
 import { HttpTypes } from "@medusajs/types"
 import { getProductPrice } from "@lib/util/get-product-price"
+import { normalizeCategoryText } from "./map-category"
 import { GimmaProduct } from "./types"
+import { mapGimmaVariants } from "./variants"
 
 const COLOR_HEX: Record<string, string> = {
   black: "#111111",
@@ -72,7 +74,9 @@ export function mapMedusaToGimmaProduct(
     handle: product.handle,
     title: product.title ?? product.handle,
     description: product.description ?? "",
-    category: product.categories?.[0]?.handle ?? undefined,
+    category: product.categories?.[0]?.handle
+      ? normalizeCategoryText(product.categories[0].handle)
+      : undefined,
     price: calculated,
     compareAt,
     currency: cheapest.currency_code ?? "ars",
@@ -80,6 +84,7 @@ export function mapMedusaToGimmaProduct(
     images: images.length ? images : [thumbnail],
     sizes: mapSizes(product),
     colors: mapColors(product),
+    variants: mapGimmaVariants(product),
     badge: product.metadata?.badge as string | undefined,
     inStock: hasStock(product),
   }

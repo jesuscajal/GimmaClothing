@@ -1,5 +1,5 @@
 import Link from "next/link"
-import Image from "next/image"
+import clsx from "clsx"
 
 type Props = {
   href?: string | null
@@ -8,9 +8,9 @@ type Props = {
 }
 
 const SIZES = {
-  sm: { box: "h-10 w-10", img: 40 },
-  md: { box: "h-14 w-14", img: 56 },
-  lg: { box: "h-24 w-24", img: 96 },
+  sm: { box: "h-10 w-10", text: "text-[10px]" },
+  md: { box: "h-14 w-14", text: "text-xs" },
+  lg: { box: "h-24 w-24", text: "text-base" },
 }
 
 export default function GimmaLogo({
@@ -18,17 +18,20 @@ export default function GimmaLogo({
   size = "md",
   className = "",
 }: Props) {
-  const { box, img } = SIZES[size]
+  const { box, text } = SIZES[size]
 
   const logo = (
-    <Image
-      src="/images/logo-gimma.png"
-      alt="Gimma Clothing"
-      width={img}
-      height={img}
-      className={`${box} rounded-full object-cover ${className}`}
-      priority={size === "lg"}
-    />
+    <div
+      className={clsx(
+        "flex shrink-0 items-center justify-center rounded-full border border-beige-300 bg-white",
+        box,
+        className
+      )}
+    >
+      <span className={clsx("font-serif font-semibold leading-none text-black", text)}>
+        Gimma
+      </span>
+    </div>
   )
 
   if (!href) return logo

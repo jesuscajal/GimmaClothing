@@ -37,7 +37,7 @@ export default function DemoProductActions({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="mb-2 text-xs font-medium tracking-wide text-neutral-400 uppercase">
+        <p className="mb-2 text-xs font-medium tracking-[0.15em] text-neutral-500 uppercase">
           Talle
         </p>
         <div className="flex flex-wrap gap-2">
@@ -47,10 +47,10 @@ export default function DemoProductActions({
               type="button"
               onClick={() => setSize(s)}
               className={clsx(
-                "min-w-[3rem] rounded-full border px-4 py-2 text-sm transition",
+                "min-w-[3rem] rounded-lg border px-4 py-2 text-sm transition",
                 size === s
-                  ? "border-black bg-black text-white"
-                  : "border-neutral-300 bg-white text-black hover:border-black"
+                  ? "border-beige-400 bg-beige-100 font-medium text-black"
+                  : "border-beige-200 bg-white text-black hover:border-beige-400"
               )}
             >
               {s}
@@ -60,7 +60,7 @@ export default function DemoProductActions({
       </div>
 
       <div>
-        <p className="mb-2 text-xs font-medium tracking-wide text-neutral-400 uppercase">
+        <p className="mb-2 text-xs font-medium tracking-[0.15em] text-neutral-500 uppercase">
           Color
         </p>
         <div className="flex flex-wrap gap-3">
@@ -73,21 +73,21 @@ export default function DemoProductActions({
               className={clsx(
                 "h-9 w-9 rounded-full border-2 transition",
                 color === c.name
-                  ? "border-black ring-2 ring-black ring-offset-2"
-                  : "border-neutral-300"
+                  ? "border-beige-700 ring-2 ring-beige-300 ring-offset-2"
+                  : "border-beige-200"
               )}
               style={{ backgroundColor: c.hex }}
             />
           ))}
         </div>
-        <p className="mt-1 text-xs text-neutral-400">{color}</p>
+        <p className="mt-1 text-xs text-neutral-500">{color}</p>
       </div>
 
       <button
         type="button"
         onClick={handleAdd}
         disabled={"inStock" in product && !product.inStock}
-        className="w-full rounded-full bg-black py-4 text-sm font-medium tracking-wide text-white uppercase transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
+        className="w-full rounded-lg bg-beige-800 py-4 text-sm font-medium text-white transition hover:bg-beige-900 disabled:cursor-not-allowed disabled:opacity-40"
       >
         {added
           ? "Agregado al carrito"
@@ -98,7 +98,7 @@ export default function DemoProductActions({
 
       <a
         href={gimmaPath(basePath, "carrito")}
-        className="w-full rounded-full border border-neutral-300 bg-white py-3 text-center text-sm text-neutral-400 transition hover:border-black hover:text-black"
+        className="w-full rounded-lg border border-beige-200 bg-beige-50 py-3 text-center text-sm text-neutral-600 transition hover:border-beige-400 hover:text-black"
       >
         Ver carrito
       </a>

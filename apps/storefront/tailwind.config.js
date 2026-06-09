@@ -33,6 +33,18 @@ module.exports = {
           80: "#1F2937",
           90: "#111827",
         },
+        beige: {
+          50: "#FAF8F5",
+          100: "#F3EDE4",
+          200: "#E8DFD3",
+          300: "#D9CCBA",
+          400: "#C4B29A",
+          500: "#A89578",
+          600: "#8B7355",
+          700: "#6E5A42",
+          800: "#5C4A3A",
+          900: "#3D3228",
+        },
       },
       borderRadius: {
         none: "0px",
@@ -59,6 +71,7 @@ module.exports = {
       },
       fontFamily: {
         sans: [
+          "var(--font-inter)",
           "Inter",
           "-apple-system",
           "BlinkMacSystemFont",
@@ -67,6 +80,13 @@ module.exports = {
           "Helvetica Neue",
           "Ubuntu",
           "sans-serif",
+        ],
+        serif: [
+          "var(--font-cormorant)",
+          "Cormorant Garamond",
+          "Georgia",
+          "Times New Roman",
+          "serif",
         ],
       },
       keyframes: {

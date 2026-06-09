@@ -8,6 +8,8 @@ export type DemoCartLine = {
   color: string
   quantity: number
   image?: string
+  /** Variante Medusa — necesaria para checkout con envío */
+  variantId?: string
 }
 
 export function buildWhatsAppOrderUrl(items: DemoCartLine[]) {
