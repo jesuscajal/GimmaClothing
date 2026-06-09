@@ -62,6 +62,7 @@ Thumbs.db
 # Importación masiva (datos reales del cliente)
 import/precios.xlsx
 import/precios.csv
+import/stock-gimma.csv
 import/fotos/*
 !import/fotos/.gitkeep
 apps/storefront/public/catalog/*

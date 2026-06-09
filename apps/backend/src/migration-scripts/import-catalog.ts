@@ -50,7 +50,7 @@ export default async function importCatalog({
 
   const catalogFile = path.resolve(
     backendRoot,
-    process.env.IMPORT_CATALOG_FILE || "../../import/precios.xlsx"
+    process.env.IMPORT_CATALOG_FILE || "../../import/precios.csv"
   )
   const photosDir = path.resolve(
     backendRoot,
@@ -69,7 +69,7 @@ export default async function importCatalog({
   if (!fs.existsSync(catalogFile)) {
     throw new Error(
       `No se encontró el archivo de precios: ${catalogFile}\n` +
-        "Copiá tu Excel como import/precios.xlsx o exportalo a import/precios.csv"
+        "Ejecutá npm run prepare:whatsapp o copiá import/precios.csv"
     )
   }
 

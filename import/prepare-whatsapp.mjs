@@ -16,7 +16,8 @@ const REPO = path.resolve(__dirname, "..")
 const WHATSAPP_DIR =
   process.env.IMPORT_WHATSAPP_DIR ||
   path.join(REPO, "apps/storefront/src/imgwhatsap")
-const PRICE_FILE = process.env.IMPORT_PRICE_FILE || path.join(REPO, "import/precios.xlsx")
+const PRICE_FILE =
+  process.env.IMPORT_PRICE_FILE || path.join(REPO, "import/stock-gimma.csv")
 const OUTPUT_CSV = process.env.IMPORT_OUTPUT_CSV || path.join(REPO, "import/precios.csv")
 const FOTOS_DIR = process.env.IMPORT_FOTOS_DIR || path.join(REPO, "import/fotos")
 
@@ -30,6 +31,40 @@ function normalizeKey(value) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, " ")
     .trim()
+}
+
+/** Nombres del chat → términos de búsqueda en el stock */
+function expandWhatsAppName(nombre) {
+  const key = normalizeKey(nombre)
+  const variants = [key]
+
+  const aliases = {
+    "vestido danielli": "vestido danielle",
+    "carterita mini bag": "cartera",
+    "puperas argentina": "camisetas argentinas",
+    "remeras musculosa": "remera microfibra",
+    "musculosas": "remera microfibra cruzado",
+    "body micro encaje": "top microfibra encaje lazo",
+    "vestido largo indi": "vestido",
+    "short micro": "short gamuzado",
+    "top bruche pico": "top",
+    "manga larga a rayas": "remera microfibra",
+    "remeras a rayas": "remera microfibra",
+  }
+
+  if (aliases[key]) variants.push(aliases[key])
+
+  const piluso = key.match(/^piluso\s+(.+)$/)
+  if (piluso) {
+    const color = piluso[1]
+    if (color.includes("animal") || color.includes("print")) {
+      variants.push("piluso nordico print")
+    } else {
+      variants.push("piluso nordico liso")
+    }
+  }
+
+  return [...new Set(variants)]
 }
 
 function isMeta(line) {
@@ -92,6 +127,57 @@ function parsePrice(raw) {
   return digits ? Number(digits) : null
 }
 
+function readGimmaStockCsv(filePath) {
+  const lines = fs.readFileSync(filePath, "utf8").split(/\r?\n/).filter(Boolean)
+  const byProduct = new Map()
+
+  for (let i = 1; i < lines.length; i++) {
+    const parts = lines[i].split(";")
+    if (parts.length < 6) continue
+
+    const codigo = parts[0]?.trim() ?? ""
+    const producto = parts[1]?.trim() ?? ""
+    const color = parts[2]?.trim() ?? ""
+    const precioVenta = parsePrice(parts[5])
+    const costo = parsePrice(parts[4])
+    const precio = precioVenta ?? (costo ? Math.round(costo * 1.4) : null)
+
+    if (!producto || precio === null) continue
+
+    const marca = codigo.replace(/^\d+\s*/, "").trim()
+    const key = normalizeKey(producto)
+    const row =
+      byProduct.get(key) ||
+      {
+        nombre: producto.replace(/\s+/g, " ").trim(),
+        precios: [],
+        categoria: marca || undefined,
+      }
+
+    row.precios.push(precio)
+    byProduct.set(key, row)
+  }
+
+  return [...byProduct.values()].map((row) => ({
+    nombre: row.nombre,
+    precio: Math.min(...row.precios),
+    precioMax: Math.max(...row.precios),
+    categoria: row.categoria,
+  }))
+}
+
+function readPriceList(filePath) {
+  if (!fs.existsSync(filePath)) return []
+  const ext = path.extname(filePath).toLowerCase()
+  if (ext === ".csv") {
+    const firstLine = fs.readFileSync(filePath, "utf8").split(/\r?\n/)[0] || ""
+    if (firstLine.includes("Producto") && firstLine.includes(";")) {
+      return readGimmaStockCsv(filePath)
+    }
+  }
+  return readPricesXlsx(filePath)
+}
+
 function readPricesXlsx(filePath) {
   let XLSX
   try {
@@ -128,30 +214,55 @@ function readPricesXlsx(filePath) {
     .filter(Boolean)
 }
 
-function matchPrice(nombre, prices) {
-  const key = normalizeKey(nombre)
-  let best = null
-  let bestScore = 0
+function tokenize(value) {
+  return normalizeKey(value)
+    .split(" ")
+    .filter((t) => t.length > 1 && !["de", "con", "en", "el", "la"].includes(t))
+}
 
-  for (const row of prices) {
-    const other = normalizeKey(row.nombre)
-    let score = 0
-    if (key === other) score = 100
-    else if (key.includes(other) || other.includes(key)) score = 80
-    else {
-      const a = new Set(key.split(" "))
-      const b = new Set(other.split(" "))
-      let shared = 0
-      a.forEach((t) => b.has(t) && shared++)
-      if (shared) score = Math.round((shared / Math.max(a.size, b.size)) * 70)
+function scoreMatch(searchKey, searchTokens, row) {
+  const other = normalizeKey(row.nombre)
+  const stockTokens = tokenize(row.nombre)
+  let score = 0
+
+  if (searchKey === other) score = 100
+  else if (searchKey.includes(other) || other.includes(searchKey)) score = 88
+  else {
+    let shared = 0
+    for (const token of searchTokens) {
+      if (
+        stockTokens.some(
+          (st) => st === token || st.includes(token) || token.includes(st)
+        )
+      ) {
+        shared += 1
+      }
     }
-    if (score > bestScore) {
-      bestScore = score
-      best = row
+    if (shared && searchTokens.length) {
+      score = Math.round((shared / searchTokens.length) * 82)
     }
   }
 
-  return bestScore >= 70 ? best : null
+  return score
+}
+
+function matchPrice(nombre, prices) {
+  const variants = expandWhatsAppName(nombre)
+  let best = null
+  let bestScore = 0
+
+  for (const variant of variants) {
+    const waTokens = tokenize(variant)
+    for (const row of prices) {
+      const score = scoreMatch(variant, waTokens, row)
+      if (score > bestScore) {
+        bestScore = score
+        best = { ...row, matchScore: score }
+      }
+    }
+  }
+
+  return bestScore >= 50 ? best : null
 }
 
 function main() {
@@ -171,10 +282,10 @@ function main() {
 
   let prices = []
   if (fs.existsSync(PRICE_FILE)) {
-    prices = readPricesXlsx(PRICE_FILE)
-    console.log(`Excel precios: ${prices.length} filas`)
+    prices = readPriceList(PRICE_FILE)
+    console.log(`Lista de precios: ${PRICE_FILE} (${prices.length} productos únicos)`)
   } else {
-    console.log("Sin Excel en import/precios.xlsx — precios quedarán vacíos")
+    console.log("Sin archivo de precios — precios quedarán vacíos")
   }
 
   fs.mkdirSync(FOTOS_DIR, { recursive: true })
@@ -208,6 +319,7 @@ function main() {
       precio: price?.precio ?? "",
       foto: entry.file,
       categoria: price?.categoria ?? "",
+      stockMatch: price?.nombre ?? "",
       sinPrecio: !price,
       sinFoto: !hasPhoto,
     })
@@ -231,8 +343,17 @@ function main() {
   console.log(`  Con precio: ${conPrecio} | Sin precio: ${rows.length - conPrecio}`)
   console.log("\nPrimeras asociaciones:")
   rows.slice(0, 12).forEach((r) => {
-    console.log(`  ${r.foto} → "${r.nombre}" | ${r.precio || "SIN PRECIO"}`)
+    const stock = r.stockMatch ? ` ← ${r.stockMatch}` : ""
+    console.log(
+      `  ${r.foto} → "${r.nombre}" | ${r.precio || "SIN PRECIO"}${stock}`
+    )
   })
+
+  const sinMatch = rows.filter((r) => r.sinPrecio)
+  if (sinMatch.length) {
+    console.log(`\nSin precio en stock (${sinMatch.length}):`)
+    sinMatch.forEach((r) => console.log(`  - "${r.nombre}"`))
+  }
 
   if (warnings.length) {
     console.log(`\nAvisos (${warnings.length}):`)
@@ -240,7 +361,7 @@ function main() {
   }
 
   if (conPrecio < rows.length) {
-    console.log("\n→ Poné tu Excel en import/precios.xlsx y volvé a ejecutar.")
+    console.log("\n→ Revisá los nombres sin match y ajustá el stock o el chat.")
   } else {
     console.log("\n→ Siguiente: npm run import:catalog")
   }
