@@ -11,6 +11,7 @@ import {
 import * as fs from "fs"
 import * as path from "path"
 import {
+  DEFAULT_TALLE,
   findPhoto,
   handleFromPhoto,
   listPhotos,
@@ -217,30 +218,25 @@ export default async function importCatalog({
     fs.copyFileSync(photo!.fullPath, publicPath)
 
     const imageUrl = `${baseUrl}/catalog/${publicName}`
-    const hasSize = row.talles.length > 1 || row.talles[0] !== "Único"
-    const hasColor = row.colores.length > 1 || row.colores[0] !== "Único"
+    const sizes = row.talles.length ? row.talles : [DEFAULT_TALLE]
+    const colors = row.colores
 
-    const options = []
-    if (hasSize) {
-      options.push({ title: "Size", values: row.talles })
-    }
-    if (hasColor) {
-      options.push({ title: "Color", values: row.colores })
+    const options = [{ title: "Size", values: sizes }]
+    if (colors.length) {
+      options.push({ title: "Color", values: colors })
     }
 
     const variants = []
-    const sizes = hasSize ? row.talles : ["Único"]
-    const colors = hasColor ? row.colores : ["Único"]
+    const colorList = colors.length ? colors : [null]
 
     let variantIndex = 0
     for (const size of sizes) {
-      for (const color of colors) {
+      for (const color of colorList) {
         variantIndex += 1
-        const parts = [size, color].filter((p) => p !== "Único")
-        const title = parts.length ? parts.join(" / ") : "Único"
-        const optionValues: Record<string, string> = {}
-        if (hasSize) optionValues.Size = size
-        if (hasColor) optionValues.Color = color
+        const parts = [size, color].filter(Boolean)
+        const title = parts.length ? parts.join(" / ") : DEFAULT_TALLE
+        const optionValues: Record<string, string> = { Size: size }
+        if (color) optionValues.Color = color
 
         variants.push({
           title,
@@ -261,7 +257,7 @@ export default async function importCatalog({
       shipping_profile_id: shippingProfile.id,
       category_ids: categoryId ? [categoryId] : undefined,
       images: [{ url: imageUrl }],
-      options: options.length ? options : undefined,
+      options,
       variants,
       sales_channels: [{ id: salesChannel.id }],
     })

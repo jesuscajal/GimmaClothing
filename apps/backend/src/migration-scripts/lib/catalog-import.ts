@@ -1,6 +1,8 @@
 import * as fs from "fs"
 import * as path from "path"
 
+export const DEFAULT_TALLE = "U"
+
 export type CatalogRow = {
   nombre: string
   precio: number
@@ -10,6 +12,36 @@ export type CatalogRow = {
   talles: string[]
   colores: string[]
   rowNumber: number
+}
+
+/** Único, ~, -, vacío → "U". Talles reales del Excel se conservan. */
+export function normalizeTalle(raw: unknown): string {
+  if (raw === null || raw === undefined) return DEFAULT_TALLE
+  const t = String(raw).trim()
+  if (!t) return DEFAULT_TALLE
+  const lower = t.toLowerCase()
+  if (
+    lower === "~" ||
+    lower === "-" ||
+    lower === "único" ||
+    lower === "unico" ||
+    lower === "u"
+  ) {
+    return DEFAULT_TALLE
+  }
+  return t
+}
+
+export function normalizeColor(raw: unknown): string | null {
+  if (raw === null || raw === undefined) return null
+  const t = String(raw).trim()
+  if (!t || t === "~" || t === "-") return null
+  return t
+}
+
+export function normalizeTallesList(values: string[]): string[] {
+  const talles = [...new Set(values.map(normalizeTalle))]
+  return talles.length ? talles : [DEFAULT_TALLE]
 }
 
 export function handleFromPhoto(nombre: string, photoFile: string) {
@@ -72,7 +104,7 @@ export function parsePrice(raw: unknown): number | null {
 function splitList(raw: unknown): string[] {
   if (!raw) return []
   return String(raw)
-    .split(/[,;|/]/)
+    .split(/[,;|]/)
     .map((v) => v.trim())
     .filter(Boolean)
 }
@@ -140,8 +172,14 @@ export function readCatalog(filePath: string): CatalogRow[] {
       }
     }
 
-    const talles = splitList(raw.talles || raw.talle || raw.sizes || raw.size)
+    const talles = normalizeTallesList(
+      splitList(raw.talles || raw.talle || raw.sizes || raw.size).map(
+        normalizeTalle
+      )
+    )
     const colores = splitList(raw.colores || raw.color || raw.colors)
+      .map((c) => normalizeColor(c))
+      .filter((c): c is string => c !== null)
 
     if (!mapped.nombre) return
 
@@ -151,8 +189,8 @@ export function readCatalog(filePath: string): CatalogRow[] {
       categoria: mapped.categoria,
       descripcion: mapped.descripcion,
       foto: mapped.foto,
-      talles: talles.length ? talles : ["Único"],
-      colores: colores.length ? colores : ["Único"],
+      talles,
+      colores,
       rowNumber: mapped.rowNumber!,
     })
   })
@@ -395,8 +433,8 @@ export function whatsAppEntriesToCatalog(
       precio: priceMatch?.precio ?? 0,
       categoria: priceMatch?.categoria,
       foto: entry.file,
-      talles: ["Único"],
-      colores: ["Único"],
+      talles: [DEFAULT_TALLE],
+      colores: [],
       rowNumber: index + 2,
       sinPrecio: !priceMatch,
       sinFoto: !hasPhoto,

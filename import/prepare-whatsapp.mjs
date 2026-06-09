@@ -120,11 +120,37 @@ function findChatFile(dir) {
   return file ? path.join(dir, file) : null
 }
 
+const DEFAULT_TALLE = "U"
+
 function parsePrice(raw) {
   if (raw === null || raw === undefined || raw === "") return null
   if (typeof raw === "number") return raw < 1000 ? Math.round(raw * 1000) : Math.round(raw)
   const digits = String(raw).replace(/[^\d]/g, "")
   return digits ? Number(digits) : null
+}
+
+function normalizeTalle(raw) {
+  if (raw === null || raw === undefined) return DEFAULT_TALLE
+  const t = String(raw).trim()
+  if (!t) return DEFAULT_TALLE
+  const lower = t.toLowerCase()
+  if (
+    lower === "~" ||
+    lower === "-" ||
+    lower === "único" ||
+    lower === "unico" ||
+    lower === "u"
+  ) {
+    return DEFAULT_TALLE
+  }
+  return t
+}
+
+function normalizeColor(raw) {
+  if (!raw) return null
+  const t = String(raw).trim()
+  if (!t || t === "~" || t === "-") return null
+  return t
 }
 
 function readGimmaStockCsv(filePath) {
@@ -137,7 +163,8 @@ function readGimmaStockCsv(filePath) {
 
     const codigo = parts[0]?.trim() ?? ""
     const producto = parts[1]?.trim() ?? ""
-    const color = parts[2]?.trim() ?? ""
+    const color = normalizeColor(parts[2])
+    const talle = normalizeTalle(parts[3])
     const precioVenta = parsePrice(parts[5])
     const costo = parsePrice(parts[4])
     const precio = precioVenta ?? (costo ? Math.round(costo * 1.4) : null)
@@ -151,10 +178,14 @@ function readGimmaStockCsv(filePath) {
       {
         nombre: producto.replace(/\s+/g, " ").trim(),
         precios: [],
+        talles: new Set(),
+        colores: new Set(),
         categoria: marca || undefined,
       }
 
     row.precios.push(precio)
+    row.talles.add(talle)
+    if (color) row.colores.add(color)
     byProduct.set(key, row)
   }
 
@@ -163,6 +194,8 @@ function readGimmaStockCsv(filePath) {
     precio: Math.min(...row.precios),
     precioMax: Math.max(...row.precios),
     categoria: row.categoria,
+    talles: [...row.talles],
+    colores: [...row.colores],
   }))
 }
 
@@ -319,6 +352,8 @@ function main() {
       precio: price?.precio ?? "",
       foto: entry.file,
       categoria: price?.categoria ?? "",
+      talles: price?.talles?.length ? price.talles : [DEFAULT_TALLE],
+      colores: price?.colores ?? [],
       stockMatch: price?.nombre ?? "",
       sinPrecio: !price,
       sinFoto: !hasPhoto,
@@ -326,11 +361,13 @@ function main() {
   }
 
   const csv = [
-    "nombre,precio,foto,categoria",
+    "nombre,precio,foto,categoria,talles,colores",
     ...rows.map((r) => {
       const n = `"${r.nombre.replace(/"/g, '""')}"`
       const c = r.categoria ? `"${r.categoria.replace(/"/g, '""')}"` : ""
-      return `${n},${r.precio},${r.foto},${c}`
+      const talles = (r.talles || [DEFAULT_TALLE]).join("|")
+      const colores = (r.colores || []).join("|")
+      return `${n},${r.precio},${r.foto},${c},${talles},${colores}`
     }),
   ].join("\n")
 

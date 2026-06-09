@@ -38,7 +38,7 @@ function mapColors(product: HttpTypes.StoreProduct) {
 
 function mapSizes(product: HttpTypes.StoreProduct) {
   const sizes = optionValues(product, "size")
-  return sizes.length ? sizes : ["Único"]
+  return sizes.length ? sizes : ["U"]
 }
 
 function hasStock(product: HttpTypes.StoreProduct) {
