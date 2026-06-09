@@ -21,7 +21,7 @@
     "docker:prod:logs": "docker compose -f deploy/docker-compose.prod.yml --env-file deploy/env/docker.env logs -f",
     "db:migrate": "npm run db:migrate -w @dtc/backend",
     "db:setup": "npm run db:setup -w @dtc/backend",
-    "seed:argentina": "npm run seed:argentina -w @dtc/backend",
+    "seed:argentina": "npm run seed:argentina -w @dtc/backend"
   },
   "pnpm": {
     "overrides": {
