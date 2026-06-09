@@ -31,6 +31,12 @@ rm -f /etc/nginx/sites-enabled/default
 nginx -t
 systemctl reload nginx
 
+echo "==> Certbot (plugin nginx)..."
+if ! certbot plugins 2>/dev/null | grep -q nginx; then
+  apt-get update -qq
+  apt-get install -y -qq python3-certbot-nginx
+fi
+
 echo "==> Certificado SSL (Let's Encrypt)..."
 if certbot --nginx \
   -d "$DOMAIN" \
