@@ -69,18 +69,17 @@ export default async function setupArgentinaRegion({
     throw new Error("No se encontró ninguna tienda (store).");
   }
 
-  const currencies = store.supported_currencies ?? [];
-  const hasArs = currencies.some(
-    (c: { currency_code?: string }) => c.currency_code === "ars"
-  );
+  type StoreCurrency = { currency_code?: string; is_default?: boolean };
+  const currencies = (store.supported_currencies ?? []) as StoreCurrency[];
+  const hasArs = currencies.some((c) => c.currency_code === "ars");
 
   const supported_currencies = hasArs
-    ? currencies.map((c: { currency_code?: string }) => ({
+    ? currencies.map((c) => ({
         currency_code: c.currency_code!,
         is_default: c.currency_code === "ars",
       }))
     : [
-        ...currencies.map((c: { currency_code?: string }) => ({
+        ...currencies.map((c) => ({
           currency_code: c.currency_code!,
           is_default: false,
         })),
@@ -108,12 +107,16 @@ export default async function setupArgentinaRegion({
     ],
   });
 
-  const variantPrices = variants
+  type VariantRow = {
+    id: string;
+    product_id: string;
+    prices?: { currency_code?: string }[];
+  };
+
+  const variantPrices = (variants as VariantRow[])
     .filter(
       (variant) =>
-        !variant.prices?.some(
-          (price: { currency_code?: string }) => price.currency_code === "ars"
-        )
+        !variant.prices?.some((price) => price.currency_code === "ars")
     )
     .map((variant) => ({
       variant_id: variant.id,

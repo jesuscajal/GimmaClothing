@@ -21,11 +21,28 @@ cd apps/backend
 npx medusa user -e admin@gimmaclothing.com -p GimmaAdmin2026! 2>/dev/null || true
 cd "$ROOT"
 
+echo "==> Corregir finales de línea (CRLF) en scripts..."
+sed -i 's/\r$//' deploy/*.sh 2>/dev/null || true
+
 echo "==> build backend"
 npm run build --workspace=@dtc/backend
 
+echo "==> Sync .env al runtime de Medusa..."
+if [ -f apps/backend/.env ]; then
+  cp apps/backend/.env apps/backend/.medusa/server/.env
+fi
+
 echo "==> build storefront"
+STOREFRONT_ENV=apps/storefront/.env.local
+BACKEND_URL_BACKUP=""
+if [ -f "$STOREFRONT_ENV" ]; then
+  BACKEND_URL_BACKUP=$(grep '^NEXT_PUBLIC_MEDUSA_BACKEND_URL=' "$STOREFRONT_ENV" | cut -d= -f2- || true)
+  sed -i 's|^NEXT_PUBLIC_MEDUSA_BACKEND_URL=.*|NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://127.0.0.1:9000|' "$STOREFRONT_ENV"
+fi
 npm run build --workspace=@dtc/storefront
+if [ -n "$BACKEND_URL_BACKUP" ] && [ -f "$STOREFRONT_ENV" ]; then
+  sed -i "s|^NEXT_PUBLIC_MEDUSA_BACKEND_URL=.*|NEXT_PUBLIC_MEDUSA_BACKEND_URL=$BACKEND_URL_BACKUP|" "$STOREFRONT_ENV"
+fi
 
 echo "==> pm2"
 pm2 delete all 2>/dev/null || true
