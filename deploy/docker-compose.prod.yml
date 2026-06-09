@@ -1,0 +1,52 @@
+# PostgreSQL + Redis para producción (solo localhost, no expuestos a internet).
+#
+# Uso:
+#   cp deploy/env/docker.env.example deploy/env/docker.env
+#   docker compose -f deploy/docker-compose.prod.yml --env-file deploy/env/docker.env up -d
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: gimma_postgres_prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-medusa-store}
+      POSTGRES_USER: ${POSTGRES_USER:-gimma}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en deploy/env/docker.env}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - gimma_postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - gimma_prod
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gimma} -d ${POSTGRES_DB:-medusa-store}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: gimma_redis_prod
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - gimma_redis_prod_data:/data
+    networks:
+      - gimma_prod
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  gimma_postgres_prod_data:
+
+  gimma_redis_prod_data:
+
+networks:
+  gimma_prod:
+    driver: bridge

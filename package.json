@@ -1,0 +1,43 @@
+{
+  "name": "gimma-clothing",
+  "private": false,
+  "packageManager": "npm@10.9.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "start": "turbo start",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "backend:seed": "turbo seed --filter=@dtc/backend",
+    "backend:dev": "turbo dev --filter=@dtc/backend",
+    "storefront:dev": "turbo dev --filter=@dtc/storefront",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:prod:up": "docker compose -f deploy/docker-compose.prod.yml --env-file deploy/env/docker.env up -d",
+    "docker:prod:down": "docker compose -f deploy/docker-compose.prod.yml --env-file deploy/env/docker.env down",
+    "docker:prod:logs": "docker compose -f deploy/docker-compose.prod.yml --env-file deploy/env/docker.env logs -f",
+    "db:migrate": "npm run db:migrate -w @dtc/backend",
+    "db:setup": "npm run db:setup -w @dtc/backend",
+    "seed:argentina": "npm run seed:argentina -w @dtc/backend",
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.0.5",
+      "@types/react-dom": "19.0.5"
+    }
+  },
+  "devDependencies": {
+    "turbo": "^2.0.14",
+    "prettier": "^3.2.5"
+  },
+  "workspaces": [
+    "apps/**",
+    "!apps/backend/.medusa/**"
+  ],
+  "overrides": {
+    "ajv": "^8.0.0"
+  }
+}
