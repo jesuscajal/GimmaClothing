@@ -26,10 +26,14 @@ export default async function setupArgentinaRegion({
     fields: ["id", "name", "currency_code", "countries.iso_2"],
   });
 
-  const argentinaRegion = regions.find((region) =>
-    region.countries?.some(
-      (country: { iso_2?: string }) => country.iso_2 === "ar"
-    )
+  type RegionRow = {
+    id: string;
+    name?: string;
+    countries?: { iso_2?: string | null }[];
+  };
+
+  const argentinaRegion = (regions as RegionRow[]).find((region) =>
+    region.countries?.some((country) => country.iso_2 === "ar")
   );
 
   if (argentinaRegion) {
