@@ -58,3 +58,11 @@ logs/
 ehthumbs.db
 Thumbs.db
 **/.DS_Store
+
+# Importación masiva (datos reales del cliente)
+import/precios.xlsx
+import/precios.csv
+import/fotos/*
+!import/fotos/.gitkeep
+apps/storefront/public/catalog/*
+!apps/storefront/public/catalog/.gitkeep
