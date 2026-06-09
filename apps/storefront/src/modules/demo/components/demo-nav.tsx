@@ -5,19 +5,25 @@ import { usePathname } from "next/navigation"
 import { ShoppingBag } from "@medusajs/icons"
 import { useDemoCart } from "@modules/demo/demo-cart-context"
 import GimmaLogo from "@modules/demo/components/gimma-logo"
+import { gimmaPath } from "@lib/gimma/paths"
 import clsx from "clsx"
 
-const LINKS = [
-  { href: "/demo/inicio", label: "Inicio" },
-  { href: "/demo/tienda", label: "Tienda" },
-]
+type Props = {
+  basePath?: string
+}
 
-function CartButton({ className }: { className?: string }) {
+function CartButton({
+  className,
+  basePath,
+}: {
+  className?: string
+  basePath: string
+}) {
   const { count } = useDemoCart()
 
   return (
     <Link
-      href="/demo/carrito"
+      href={gimmaPath(basePath, "carrito")}
       aria-label={`Carrito${count > 0 ? `, ${count} productos` : ""}`}
       className={clsx(
         "relative inline-flex h-10 w-10 items-center justify-center text-black transition hover:opacity-60",
@@ -34,13 +40,18 @@ function CartButton({ className }: { className?: string }) {
   )
 }
 
-export default function DemoNav() {
+export default function DemoNav({ basePath = "/demo" }: Props) {
   const pathname = usePathname()
+
+  const links = [
+    { href: gimmaPath(basePath, "inicio"), label: "Inicio" },
+    { href: gimmaPath(basePath, "tienda"), label: "Tienda" },
+  ]
 
   return (
     <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/demo/inicio" className="flex items-center gap-3">
+        <Link href={gimmaPath(basePath, "inicio")} className="flex items-center gap-3">
           <GimmaLogo href={null} size="sm" />
           <span className="hidden text-sm font-medium tracking-[0.15em] text-black uppercase sm:inline">
             Gimma Clothing
@@ -48,7 +59,7 @@ export default function DemoNav() {
         </Link>
 
         <nav className="hidden items-center gap-8 sm:flex">
-          {LINKS.map((link) => (
+          {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -64,11 +75,11 @@ export default function DemoNav() {
           ))}
         </nav>
 
-        <CartButton />
+        <CartButton basePath={basePath} />
       </div>
 
       <nav className="flex items-center justify-center gap-6 border-t border-neutral-100 bg-neutral-50 py-2 sm:hidden">
-        {LINKS.map((link) => (
+        {links.map((link) => (
           <Link
             key={link.href}
             href={link.href}
@@ -82,7 +93,7 @@ export default function DemoNav() {
             {link.label}
           </Link>
         ))}
-        <CartButton />
+        <CartButton basePath={basePath} />
       </nav>
     </header>
   )

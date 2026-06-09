@@ -21,6 +21,6 @@ export const gimmaConfig = {
 
   productionHome: () => {
     const country = process.env.NEXT_PUBLIC_DEFAULT_REGION || "ar"
-    return `/${country}`
+    return `/${country}/inicio`
   },
 } as const

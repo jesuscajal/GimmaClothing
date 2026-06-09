@@ -1,11 +1,38 @@
 import Link from "next/link"
-import { DemoProduct, formatDemoPrice } from "@lib/demo/data"
+import { DemoProduct } from "@lib/demo/data"
+import { GimmaProduct } from "@lib/gimma/types"
+import { formatDemoPrice } from "@lib/demo/data"
+import { formatGimmaPrice } from "@lib/gimma/format-price"
+import { gimmaPath } from "@lib/gimma/paths"
 import clsx from "clsx"
 
-export default function DemoProductCard({ product }: { product: DemoProduct }) {
+type Product = DemoProduct | GimmaProduct
+
+function formatPrice(product: Product) {
+  if ("currency" in product) {
+    return formatGimmaPrice(product.price, product.currency)
+  }
+  return formatDemoPrice(product.price)
+}
+
+function formatCompare(product: Product) {
+  if (!product.compareAt) return null
+  if ("currency" in product) {
+    return formatGimmaPrice(product.compareAt, product.currency)
+  }
+  return formatDemoPrice(product.compareAt)
+}
+
+export default function DemoProductCard({
+  product,
+  basePath = "/demo",
+}: {
+  product: Product
+  basePath?: string
+}) {
   return (
     <Link
-      href={`/demo/producto/${product.handle}`}
+      href={gimmaPath(basePath, `producto/${product.handle}`)}
       className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200/80 transition duration-300 hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
@@ -32,11 +59,11 @@ export default function DemoProductCard({ product }: { product: DemoProduct }) {
         <h3 className="text-sm font-medium text-black">{product.title}</h3>
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-black">
-            {formatDemoPrice(product.price)}
+            {formatPrice(product)}
           </span>
           {product.compareAt && (
             <span className="text-xs text-neutral-400 line-through">
-              {formatDemoPrice(product.compareAt)}
+              {formatCompare(product)}
             </span>
           )}
         </div>

@@ -2,12 +2,25 @@
 
 import Link from "next/link"
 import { formatDemoPrice } from "@lib/demo/data"
+import { formatGimmaPrice } from "@lib/gimma/format-price"
+import { gimmaPath } from "@lib/gimma/paths"
 import { buildWhatsAppOrderUrl } from "@lib/demo/whatsapp"
 import { useDemoCart } from "@modules/demo/demo-cart-context"
 import { getDemoProduct } from "@lib/demo/data"
 
-export default function DemoCartView() {
+type Props = {
+  basePath?: string
+  currency?: string
+}
+
+export default function DemoCartView({
+  basePath = "/demo",
+  currency,
+}: Props) {
   const { items, updateQuantity, removeItem, clearCart } = useDemoCart()
+
+  const formatPrice = (amount: number) =>
+    currency ? formatGimmaPrice(amount, currency) : formatDemoPrice(amount)
 
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
   const whatsappUrl = buildWhatsAppOrderUrl(items)
@@ -17,7 +30,7 @@ export default function DemoCartView() {
       <div className="flex flex-col items-center rounded-lg bg-white py-20 text-center">
         <p className="text-lg text-neutral-400">Tu carrito está vacío</p>
         <Link
-          href="/demo/tienda"
+          href={gimmaPath(basePath, "tienda")}
           className="mt-6 bg-black px-8 py-3 text-sm font-medium text-white uppercase"
         >
           Ir a la tienda
@@ -32,16 +45,18 @@ export default function DemoCartView() {
         <ul className="divide-y divide-neutral-200">
           {items.map((item) => {
             const product = getDemoProduct(item.handle)
+            const image = item.image ?? product?.image
+
             return (
               <li
                 key={`${item.handle}-${item.size}-${item.color}`}
                 className="flex gap-4 py-6"
               >
                 <div className="h-28 w-24 shrink-0 overflow-hidden rounded-xl bg-neutral-100 ring-1 ring-neutral-200/80">
-                  {product && (
+                  {image && (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
-                      src={product.image}
+                      src={image}
                       alt={item.title}
                       className="h-full w-full object-cover"
                     />
@@ -50,7 +65,7 @@ export default function DemoCartView() {
                 <div className="flex flex-1 flex-col justify-between">
                   <div>
                     <Link
-                      href={`/demo/producto/${item.handle}`}
+                      href={gimmaPath(basePath, `producto/${item.handle}`)}
                       className="font-medium text-black hover:underline"
                     >
                       {item.title}
@@ -59,7 +74,7 @@ export default function DemoCartView() {
                       {item.color} · Talle {item.size}
                     </p>
                     <p className="mt-1 text-sm font-semibold text-black">
-                      {formatDemoPrice(item.price)}
+                      {formatPrice(item.price)}
                     </p>
                   </div>
                   <div className="mt-4 flex items-center gap-4">
@@ -108,7 +123,7 @@ export default function DemoCartView() {
                   </div>
                 </div>
                 <p className="text-sm font-semibold text-black">
-                  {formatDemoPrice(item.price * item.quantity)}
+                  {formatPrice(item.price * item.quantity)}
                 </p>
               </li>
             )
@@ -131,7 +146,7 @@ export default function DemoCartView() {
           <div className="flex justify-between">
             <span className="text-neutral-400">Subtotal</span>
             <span className="font-semibold text-black">
-              {formatDemoPrice(total)}
+              {formatPrice(total)}
             </span>
           </div>
           <div className="flex justify-between">
@@ -142,7 +157,7 @@ export default function DemoCartView() {
         <div className="mt-4 flex justify-between border-t border-neutral-200 pt-4">
           <span className="text-lg font-medium text-black">Total</span>
           <span className="text-lg font-semibold text-black">
-            {formatDemoPrice(total)}
+            {formatPrice(total)}
           </span>
         </div>
 
@@ -163,7 +178,7 @@ export default function DemoCartView() {
         </p>
 
         <Link
-          href="/demo/tienda"
+          href={gimmaPath(basePath, "tienda")}
           className="mt-4 block text-center text-sm text-neutral-400 underline hover:text-black"
         >
           Seguir comprando

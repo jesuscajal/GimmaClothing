@@ -7,6 +7,7 @@ export type DemoCartLine = {
   size: string
   color: string
   quantity: number
+  image?: string
 }
 
 export function buildWhatsAppOrderUrl(items: DemoCartLine[]) {

@@ -4,7 +4,7 @@ import { gimmaConfig } from "@lib/gimma/config"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
-const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "dk"
+const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "ar"
 
 const regionMapCache = {
   regionMap: new Map<string, HttpTypes.StoreRegion>(),
@@ -117,6 +117,21 @@ export async function middleware(request: NextRequest) {
 
   if (request.nextUrl.pathname.includes(".")) {
     return NextResponse.next()
+  }
+
+  const pathSegments = request.nextUrl.pathname.split("/").filter(Boolean)
+  if (
+    pathSegments.length === 1 &&
+    !gimmaConfig.isDemoRoot()
+  ) {
+    const cacheIdCookie = request.cookies.get("_medusa_cache_id")
+    const cacheId = cacheIdCookie?.value || crypto.randomUUID()
+    const regionMap = await getRegionMap(cacheId)
+    if (regionMap.has(pathSegments[0].toLowerCase())) {
+      return NextResponse.redirect(
+        new URL(`/${pathSegments[0]}/inicio`, request.url)
+      )
+    }
   }
 
   const cacheIdCookie = request.cookies.get("_medusa_cache_id")

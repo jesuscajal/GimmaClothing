@@ -2,10 +2,20 @@
 
 import { useState } from "react"
 import { DemoProduct } from "@lib/demo/data"
+import { GimmaProduct } from "@lib/gimma/types"
 import { useDemoCart } from "@modules/demo/demo-cart-context"
+import { gimmaPath } from "@lib/gimma/paths"
 import clsx from "clsx"
 
-export default function DemoProductActions({ product }: { product: DemoProduct }) {
+type Product = DemoProduct | GimmaProduct
+
+export default function DemoProductActions({
+  product,
+  basePath = "/demo",
+}: {
+  product: Product
+  basePath?: string
+}) {
   const { addItem } = useDemoCart()
   const [size, setSize] = useState(product.sizes[0])
   const [color, setColor] = useState(product.colors[0].name)
@@ -18,6 +28,7 @@ export default function DemoProductActions({ product }: { product: DemoProduct }
       price: product.price,
       size,
       color,
+      image: product.image,
     })
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
@@ -75,13 +86,18 @@ export default function DemoProductActions({ product }: { product: DemoProduct }
       <button
         type="button"
         onClick={handleAdd}
-        className="w-full rounded-full bg-black py-4 text-sm font-medium tracking-wide text-white uppercase transition hover:bg-neutral-800"
+        disabled={"inStock" in product && !product.inStock}
+        className="w-full rounded-full bg-black py-4 text-sm font-medium tracking-wide text-white uppercase transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {added ? "Agregado al carrito" : "Agregar al carrito"}
+        {added
+          ? "Agregado al carrito"
+          : "inStock" in product && !product.inStock
+            ? "Sin stock"
+            : "Agregar al carrito"}
       </button>
 
       <a
-        href="/demo/carrito"
+        href={gimmaPath(basePath, "carrito")}
         className="w-full rounded-full border border-neutral-300 bg-white py-3 text-center text-sm text-neutral-400 transition hover:border-black hover:text-black"
       >
         Ver carrito

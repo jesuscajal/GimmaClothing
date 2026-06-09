@@ -10,7 +10,7 @@ import {
 } from "react"
 import { DemoCartLine } from "@lib/demo/whatsapp"
 
-const STORAGE_KEY = "gimma-demo-cart"
+const DEFAULT_STORAGE_KEY = "gimma-demo-cart"
 
 type DemoCartContextValue = {
   items: DemoCartLine[]
@@ -28,26 +28,32 @@ type DemoCartContextValue = {
 
 const DemoCartContext = createContext<DemoCartContextValue | null>(null)
 
-function loadCart(): DemoCartLine[] {
+function loadCart(storageKey: string): DemoCartLine[] {
   if (typeof window === "undefined") return []
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(storageKey)
     return raw ? (JSON.parse(raw) as DemoCartLine[]) : []
   } catch {
     return []
   }
 }
 
-export function DemoCartProvider({ children }: { children: React.ReactNode }) {
+export function DemoCartProvider({
+  children,
+  storageKey = DEFAULT_STORAGE_KEY,
+}: {
+  children: React.ReactNode
+  storageKey?: string
+}) {
   const [items, setItems] = useState<DemoCartLine[]>([])
 
   useEffect(() => {
-    setItems(loadCart())
-  }, [])
+    setItems(loadCart(storageKey))
+  }, [storageKey])
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
-  }, [items])
+    localStorage.setItem(storageKey, JSON.stringify(items))
+  }, [items, storageKey])
 
   const addItem = useCallback(
     (item: Omit<DemoCartLine, "quantity"> & { quantity?: number }) => {
