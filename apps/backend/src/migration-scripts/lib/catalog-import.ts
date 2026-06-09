@@ -12,6 +12,13 @@ export type CatalogRow = {
   rowNumber: number
 }
 
+export function handleFromPhoto(nombre: string, photoFile: string) {
+  const suffix =
+    photoFile.match(/wa\d+/i)?.[0]?.toLowerCase() ||
+    path.parse(photoFile).name.toLowerCase()
+  return `${slugify(nombre)}-${suffix}`.slice(0, 80)
+}
+
 const IMAGE_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".heic"])
 
 const HEADER_MAP: Record<string, keyof Omit<CatalogRow, "rowNumber" | "talles" | "colores">> = {
@@ -136,11 +143,11 @@ export function readCatalog(filePath: string): CatalogRow[] {
     const talles = splitList(raw.talles || raw.talle || raw.sizes || raw.size)
     const colores = splitList(raw.colores || raw.color || raw.colors)
 
-    if (!mapped.nombre || !mapped.precio) return
+    if (!mapped.nombre) return
 
     rows.push({
       nombre: mapped.nombre,
-      precio: mapped.precio!,
+      precio: mapped.precio ?? 0,
       categoria: mapped.categoria,
       descripcion: mapped.descripcion,
       foto: mapped.foto,

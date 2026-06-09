@@ -12,10 +12,10 @@ import * as fs from "fs"
 import * as path from "path"
 import {
   findPhoto,
+  handleFromPhoto,
   listPhotos,
   previewMatches,
   readCatalog,
-  slugify,
 } from "./lib/catalog-import"
 
 /**
@@ -65,6 +65,9 @@ export default async function importCatalog({
   ).replace(/\/$/, "")
   const dryRun = process.env.IMPORT_DRY_RUN === "true"
   const defaultStock = Number(process.env.IMPORT_DEFAULT_STOCK || "50")
+  const placeholderPrice = Number(
+    process.env.IMPORT_PLACEHOLDER_PRICE || "1000"
+  )
 
   if (!fs.existsSync(catalogFile)) {
     throw new Error(
@@ -163,15 +166,32 @@ export default async function importCatalog({
   fs.mkdirSync(publicDir, { recursive: true })
 
   const productsToCreate = []
+  const seenPhotos = new Set<string>()
+  const usedHandles = new Set(existingHandles)
 
   for (const match of ready) {
     const { row, photo } = match
-    const handle = slugify(row.nombre)
+    const photoFile = photo!.file
+    const photoKey = photoFile.toLowerCase()
 
-    if (existingHandles.has(handle)) {
-      logger.info(`Omitiendo "${row.nombre}" (ya existe: ${handle})`)
+    if (seenPhotos.has(photoKey)) {
+      logger.info(
+        `Omitiendo duplicado (misma foto): ${photoFile} — "${row.nombre}"`
+      )
       continue
     }
+
+    const handle = handleFromPhoto(row.nombre, photoFile)
+
+    if (usedHandles.has(handle)) {
+      logger.info(`Omitiendo duplicado (ya en tienda): ${handle}`)
+      continue
+    }
+
+    seenPhotos.add(photoKey)
+    usedHandles.add(handle)
+
+    const unitPrice = row.precio > 0 ? row.precio : placeholderPrice
 
     let categoryId: string | undefined
     if (row.categoria) {
@@ -191,7 +211,7 @@ export default async function importCatalog({
       }
     }
 
-    const ext = path.extname(photo!.file).toLowerCase() || ".jpg"
+    const ext = path.extname(photoFile).toLowerCase() || ".jpg"
     const publicName = `${handle}${ext}`
     const publicPath = path.join(publicDir, publicName)
     fs.copyFileSync(photo!.fullPath, publicPath)
@@ -226,7 +246,7 @@ export default async function importCatalog({
           title,
           sku: `GIMMA-${handle}-${variantIndex}`.toUpperCase().slice(0, 50),
           options: optionValues,
-          prices: [{ amount: row.precio, currency_code: "ars" }],
+          prices: [{ amount: unitPrice, currency_code: "ars" }],
         })
       }
     }
@@ -254,9 +274,16 @@ export default async function importCatalog({
 
   logger.info(`Creando ${productsToCreate.length} productos...`)
 
-  await createProductsWorkflow(container).run({
-    input: { products: productsToCreate },
-  })
+  const batchSize = 15
+  for (let i = 0; i < productsToCreate.length; i += batchSize) {
+    const batch = productsToCreate.slice(i, i + batchSize)
+    await createProductsWorkflow(container).run({
+      input: { products: batch },
+    })
+    logger.info(
+      `Lote ${Math.floor(i / batchSize) + 1}: ${batch.length} productos`
+    )
+  }
 
   const { data: stockLocations } = await query.graph({
     entity: "stock_location",
