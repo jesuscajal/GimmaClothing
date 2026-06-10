@@ -1,5 +1,5 @@
 import Link from "next/link"
-import GimmaLogo from "@modules/demo/components/gimma-logo"
+import GimmaBrandTitle from "@modules/demo/components/gimma-brand-title"
 import { gimmaPath } from "@lib/gimma/paths"
 
 type Props = {
@@ -8,13 +8,15 @@ type Props = {
 
 export default function DemoFooter({ basePath = "/demo" }: Props) {
   return (
-    <footer className="mt-auto border-t border-beige-200 bg-white">
+    <footer className="mt-auto border-t border-neutral-400/30 bg-neutral-200/80">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="flex flex-col gap-8 sm:flex-row sm:justify-between">
           <div className="flex items-start gap-4">
-            <GimmaLogo href={gimmaPath(basePath, "inicio")} size="md" />
+            <Link href={gimmaPath(basePath, "inicio")}>
+              <GimmaBrandTitle size="sm" />
+            </Link>
             <div>
-              <p className="font-serif text-lg text-black">Gimma Clothing</p>
+              <p className="font-serif text-lg text-black sr-only">Gimma Clothing</p>
               <p className="mt-2 max-w-xs text-sm text-neutral-500">
                 Moda minimal. Pedí por WhatsApp.
               </p>

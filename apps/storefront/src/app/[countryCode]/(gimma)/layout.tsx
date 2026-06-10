@@ -13,7 +13,7 @@ export default async function GimmaStoreLayout({ children, params }: Props) {
 
   return (
     <DemoCartProvider storageKey="gimma-store-cart">
-      <div className="flex min-h-screen flex-col bg-beige-50 text-black antialiased">
+      <div className="flex min-h-screen flex-col bg-neutral-300 text-black antialiased">
         <DemoNav basePath={basePath} />
         {children}
         <DemoFooter basePath={basePath} />
