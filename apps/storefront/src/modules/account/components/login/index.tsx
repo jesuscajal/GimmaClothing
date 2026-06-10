@@ -14,26 +14,29 @@ const Login = ({ setCurrentView }: Props) => {
 
   return (
     <div
-      className="max-w-sm w-full flex flex-col items-center"
+      className="flex w-full flex-col items-center"
       data-testid="login-page"
     >
-      <h1 className="text-large-semi uppercase mb-6">Welcome back</h1>
-      <p className="text-center text-base-regular text-ui-fg-base mb-8">
-        Sign in to access an enhanced shopping experience.
+      <h2 className="font-serif text-2xl font-semibold text-black">
+        Bienvenida de nuevo
+      </h2>
+      <p className="mt-2 text-center text-sm text-neutral-600">
+        Iniciá sesión para ver tus pedidos y gestionar tu cuenta en Gimma
+        Clothing.
       </p>
-      <form className="w-full" action={formAction}>
-        <div className="flex flex-col w-full gap-y-2">
+      <form className="mt-8 w-full" action={formAction}>
+        <div className="flex w-full flex-col gap-y-3">
           <Input
             label="Email"
             name="email"
             type="email"
-            title="Enter a valid email address."
+            title="Ingresá un email válido."
             autoComplete="email"
             required
             data-testid="email-input"
           />
           <Input
-            label="Password"
+            label="Contraseña"
             name="password"
             type="password"
             autoComplete="current-password"
@@ -42,20 +45,22 @@ const Login = ({ setCurrentView }: Props) => {
           />
         </div>
         <ErrorMessage error={message} data-testid="login-error-message" />
-        <SubmitButton data-testid="sign-in-button" className="w-full mt-6">
-          Sign in
+        <SubmitButton
+          data-testid="sign-in-button"
+          className="mt-6 w-full !rounded-full !bg-black !text-white hover:!bg-neutral-800"
+        >
+          Iniciar sesión
         </SubmitButton>
       </form>
-      <span className="text-center text-ui-fg-base text-small-regular mt-6">
-        Not a member?{" "}
+      <span className="mt-6 text-center text-sm text-neutral-600">
+        ¿No tenés cuenta?{" "}
         <button
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
-          className="underline"
+          className="font-medium text-black underline"
           data-testid="register-button"
         >
-          Join us
+          Crear cuenta
         </button>
-        .
       </span>
     </div>
   )

@@ -20,13 +20,15 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
   return (
     <div className="flex flex-col justify-center gap-y-4">
       <div className="flex gap-2 justify-between items-center">
-        <h1 className="text-2xl-semi">Order details</h1>
+        <h1 className="font-serif text-2xl font-semibold text-black">
+          Detalle del pedido
+        </h1>
         <LocalizedClientLink
           href="/account/orders"
-          className="flex gap-2 items-center text-ui-fg-subtle hover:text-ui-fg-base"
+          className="flex items-center gap-2 text-sm text-neutral-600 hover:text-black"
           data-testid="back-to-overview-button"
         >
-          <XMark /> Back to overview
+          <XMark /> Volver a pedidos
         </LocalizedClientLink>
       </div>
       <div

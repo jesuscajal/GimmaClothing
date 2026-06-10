@@ -9,8 +9,8 @@ import { listRegions } from "@lib/data/regions"
 import { retrieveCustomer } from "@lib/data/customer"
 
 export const metadata: Metadata = {
-  title: "Profile",
-  description: "View and edit your Medusa Store profile.",
+  title: "Perfil",
+  description: "Gestioná tu perfil en Gimma Clothing.",
 }
 
 export default async function Profile() {
@@ -24,11 +24,10 @@ export default async function Profile() {
   return (
     <div className="w-full" data-testid="profile-page-wrapper">
       <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl-semi">Profile</h1>
-        <p className="text-base-regular">
-          View and update your profile information, including your name, email,
-          and phone number. You can also update your billing address, or change
-          your password.
+        <h1 className="font-serif text-2xl font-semibold text-black">Perfil</h1>
+        <p className="text-sm text-neutral-600">
+          Actualizá tu nombre, email, teléfono y dirección de facturación en
+          Gimma Clothing.
         </p>
       </div>
       <div className="flex flex-col gap-y-8 w-full">

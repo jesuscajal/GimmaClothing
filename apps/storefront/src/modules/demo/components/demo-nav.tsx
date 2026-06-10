@@ -48,6 +48,7 @@ export default function DemoNav({ basePath = "/demo" }: Props) {
   const links = [
     { href: gimmaPath(basePath, "inicio"), label: "Inicio" },
     { href: gimmaPath(basePath, "tienda"), label: "Tienda" },
+    { href: `${basePath}/account`, label: "Mi cuenta" },
   ]
 
   return (
