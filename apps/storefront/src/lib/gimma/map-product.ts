@@ -61,9 +61,13 @@ export function mapMedusaToGimmaProduct(
   const cheapest = priceInfo.cheapestPrice
   if (!cheapest) return null
 
-  const images =
+  const imageUrls =
     product.images?.map((img) => img.url).filter(Boolean) as string[] ?? []
-  const thumbnail = product.thumbnail ?? images[0] ?? "/images/logo-gimma.png"
+  const thumbnail = product.thumbnail
+  const images = thumbnail
+    ? [thumbnail, ...imageUrls.filter((url) => url !== thumbnail)]
+    : imageUrls
+  const primary = images[0] ?? thumbnail ?? "/images/logo-gimma.png"
 
   const original = cheapest.original_price_number
   const calculated = cheapest.calculated_price_number
@@ -81,8 +85,8 @@ export function mapMedusaToGimmaProduct(
     price: calculated,
     compareAt,
     currency: cheapest.currency_code ?? "ars",
-    image: thumbnail,
-    images: images.length ? images : [thumbnail],
+    image: primary,
+    images: images.length ? images : [primary],
     sizes: mapSizes(product),
     colors: mapColors(product),
     variants: mapGimmaVariants(product),

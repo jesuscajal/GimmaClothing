@@ -4,10 +4,12 @@ import { listProducts } from "./products"
 
 export async function getProductByHandle(
   handle: string,
-  countryCode: string
+  countryCode: string,
+  revalidate = 60
 ) {
   const { response } = await listProducts({
     countryCode,
+    revalidate,
     queryParams: {
       handle,
       limit: 1,
