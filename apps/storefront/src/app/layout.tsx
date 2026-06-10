@@ -18,6 +18,16 @@ const cormorant = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
+  title: {
+    default: "Gimma Clothing",
+    template: "%s | Gimma Clothing",
+  },
+  description: "Moda minimal. Pedí por WhatsApp.",
+  icons: {
+    icon: "/images/logo-gimma.png",
+    shortcut: "/images/logo-gimma.png",
+    apple: "/images/logo-gimma.png",
+  },
 }
 
 export default function RootLayout(props: { children: React.ReactNode }) {
