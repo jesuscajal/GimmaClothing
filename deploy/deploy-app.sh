@@ -37,12 +37,30 @@ else
   echo "AVISO: Falta deploy/env/docker.env — copiá desde deploy/env/docker.env.example"
 fi
 
+echo "==> Carpeta persistente de imágenes..."
+MEDUSA_STATIC_DIR="$ROOT/data/medusa-static"
+mkdir -p "$MEDUSA_STATIC_DIR"
+if [ -d apps/backend/.medusa/server/static ]; then
+  cp -an apps/backend/.medusa/server/static/. "$MEDUSA_STATIC_DIR/" 2>/dev/null || true
+fi
+
 echo "==> Build backend..."
 npm run build --workspace=@dtc/backend
 
 echo "==> Sync .env al runtime de Medusa..."
 if [ -f apps/backend/.env ]; then
   cp apps/backend/.env apps/backend/.medusa/server/.env
+fi
+
+echo "==> Corregir URLs de imágenes subidas (localhost -> producción)..."
+if [ -f apps/backend/.env ] && grep -q '^MEDUSA_FILE_BACKEND_URL=' apps/backend/.env; then
+  FILE_BASE=$(grep '^MEDUSA_FILE_BACKEND_URL=' apps/backend/.env | cut -d= -f2- | tr -d '[:space:]')
+  FILE_BASE="${FILE_BASE%/}"
+  docker exec -i gimma_postgres_prod psql -U gimma -d medusa-store -v ON_ERROR_STOP=1 <<-EOSQL
+UPDATE image
+SET url = REPLACE(url, 'http://localhost:9000/static/', '${FILE_BASE}/')
+WHERE url LIKE 'http://localhost:9000/static/%';
+EOSQL
 fi
 
 echo "==> Build storefront..."
