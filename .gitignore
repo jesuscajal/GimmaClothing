@@ -23,6 +23,7 @@ coverage
 # Production
 **/build
 **/dist
+**/tsconfig.tsbuildinfo
 
 # Misc
 *.pem
