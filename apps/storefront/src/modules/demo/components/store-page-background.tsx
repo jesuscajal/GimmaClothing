@@ -1,7 +1,7 @@
 export default function StorePageBackground() {
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
       aria-hidden
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
