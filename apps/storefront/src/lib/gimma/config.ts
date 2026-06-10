@@ -11,7 +11,7 @@ export const gimmaConfig = {
   /** País/región por defecto en producción (ISO 2) */
   defaultCountry: process.env.NEXT_PUBLIC_DEFAULT_REGION || "ar",
 
-  whatsapp: process.env.NEXT_PUBLIC_DEMO_WHATSAPP || "5491123456789",
+  whatsapp: process.env.NEXT_PUBLIC_DEMO_WHATSAPP || "5493705244120",
 
   /** Rutas del laboratorio de diseño (siempre accesibles si existen) */
   demoBasePath: "/demo",

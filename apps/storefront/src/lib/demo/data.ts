@@ -14,7 +14,7 @@ export type DemoProduct = {
 }
 
 export const DEMO_WHATSAPP =
-  process.env.NEXT_PUBLIC_DEMO_WHATSAPP || "5491123456789"
+  process.env.NEXT_PUBLIC_DEMO_WHATSAPP || "5493705244120"
 
 export const DEMO_CATEGORIES = [
   { id: "mujer", label: "Mujer", image: "https://images.unsplash.com/photo-1483985988355-763728e3685b?w=600&q=80" },
