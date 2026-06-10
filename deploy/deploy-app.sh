@@ -40,12 +40,15 @@ fi
 echo "==> Carpeta persistente de imágenes..."
 MEDUSA_STATIC_DIR="$ROOT/data/medusa-static"
 mkdir -p "$MEDUSA_STATIC_DIR"
-if [ -d apps/backend/.medusa/server/static ]; then
+if [ -d apps/backend/.medusa/server/static ] && [ ! -L apps/backend/.medusa/server/static ]; then
   cp -an apps/backend/.medusa/server/static/. "$MEDUSA_STATIC_DIR/" 2>/dev/null || true
 fi
 
 echo "==> Build backend..."
 npm run build --workspace=@dtc/backend
+
+echo "==> Enlazar imágenes al runtime de Medusa..."
+ln -sfn "$MEDUSA_STATIC_DIR" apps/backend/.medusa/server/static
 
 echo "==> Sync .env al runtime de Medusa..."
 if [ -f apps/backend/.env ]; then
