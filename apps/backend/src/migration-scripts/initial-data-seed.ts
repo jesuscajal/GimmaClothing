@@ -733,4 +733,10 @@ export default async function initial_data_seed({
   });
 
   logger.info("Finished seeding inventory levels data.");
+
+  logger.info("============================================");
+  logger.info("Gimma Clothing — datos iniciales listos");
+  logger.info(`Publishable API Key: ${publishableApiKey.token}`);
+  logger.info("Ejecutá: npm run env:sync -w @dtc/backend");
+  logger.info("============================================");
 }

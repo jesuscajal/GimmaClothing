@@ -9,13 +9,18 @@ export const listRegions = async () => {
     ...(await getCacheOptions("regions")),
   }
 
-  return await sdk.client
-    .fetch<{ regions: HttpTypes.StoreRegion[] }>(`/store/regions`, {
-      method: "GET",
-      next,
-      cache: "force-cache",
-    })
-    .then(({ regions }) => regions)
+  try {
+    return await sdk.client
+      .fetch<{ regions: HttpTypes.StoreRegion[] }>(`/store/regions`, {
+        method: "GET",
+        next,
+        cache: "force-cache",
+      })
+      .then(({ regions }) => regions)
+  } catch (error) {
+    console.error("[gimma] No se pudo conectar con Medusa /store/regions:", error)
+    return []
+  }
 }
 
 export const retrieveRegion = async (id: string) => {

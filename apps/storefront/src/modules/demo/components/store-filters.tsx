@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { Adjustments } from "@medusajs/icons"
-import CollectionBanner from "@modules/demo/components/collection-banner"
+import CollectionBanner from "./collection-banner"
 import clsx from "clsx"
 
 export type StoreFilterItem = {

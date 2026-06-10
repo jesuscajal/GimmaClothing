@@ -104,19 +104,26 @@ Abre **http://localhost:8000/demo** — tienda (cliente) y **http://localhost:80
 | API backend | http://localhost:9000 |
 | Tienda (storefront) | http://localhost:8000 |
 
-## Clave publicable del storefront
+## Conectar storefront a la base de datos
 
-Tras el seed, crea o copia una **Publishable API Key** desde el admin:
+Tras `npm run db:setup`, el script **sincroniza automáticamente** la publishable key de PostgreSQL hacia `apps/storefront/.env.local` (región `ar`, modo `production`).
 
-1. Abre http://localhost:9000/app  
-2. Ve a **Settings → Publishable API Keys**  
-3. Copia la clave y pégala en `apps/storefront/.env.local`:
+Si ya tenés la DB corriendo y solo necesitás actualizar el env:
 
-```env
-NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_...
+```powershell
+npm run env:sync
 ```
 
-Reinicia el storefront si ya estaba corriendo.
+Variables que quedan en `apps/storefront/.env.local`:
+
+```env
+NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_...   # desde la DB
+NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:9000
+NEXT_PUBLIC_DEFAULT_REGION=ar
+NEXT_PUBLIC_GIMMA_ROOT=production
+```
+
+Reiniciá el storefront después de sincronizar. La tienda real queda en **http://localhost:8000/ar/inicio**; el laboratorio de diseño sigue en **/demo**.
 
 ## Comandos útiles
 
@@ -129,6 +136,9 @@ npm run db:migrate
 
 # Solo datos demo (tras migrar)
 npm run backend:seed
+
+# Sincronizar publishable key → storefront/.env.local
+npm run env:sync
 
 # Ver logs de Docker
 docker compose logs -f

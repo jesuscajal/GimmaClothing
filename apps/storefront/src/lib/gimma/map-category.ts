@@ -43,7 +43,7 @@ export function categoriesWithProducts(
   productCategoryHandles: Iterable<string | undefined>
 ): GimmaCategory[] {
   const handles = new Set(
-    [...productCategoryHandles].filter((h): h is string => Boolean(h))
+    Array.from(productCategoryHandles).filter((h): h is string => Boolean(h))
   )
   return categories
     .filter((c) => handles.has(c.handle))

@@ -15,6 +15,19 @@ function checkEnvVariables() {
     return !process.env[env.key];
   });
 
+  const placeholderKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+  if (
+    placeholderKey === "pk_demo_visual_preview" ||
+    placeholderKey === "pk_reemplazar_tras_db_setup"
+  ) {
+    console.warn(
+      c.yellow.bold(
+        "\n⚠️  Publishable key de demo detectada. Para datos reales ejecutá:\n"
+      )
+    )
+    console.warn(c.dim("   npm run docker:up && npm run db:setup\n"))
+  }
+
   if (missingEnvs.length > 0) {
     console.error(
       c.red.bold("\n🚫 Error: Missing required environment variables\n")
