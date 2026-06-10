@@ -29,8 +29,8 @@ export default function StorePageIntro({
       <div className="relative mt-6 overflow-hidden rounded-3xl">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200&q=80"
-          alt="Tienda Gimma Clothing"
+          src="/images/store-banner.png"
+          alt="Local Gimma Clothing"
           className="aspect-[16/10] w-full object-cover sm:aspect-[21/9]"
         />
       </div>
