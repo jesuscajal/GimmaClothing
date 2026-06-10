@@ -30,7 +30,7 @@ export default function StorePageIntro({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/images/store-banner.png"
-          alt="Local Gimma Clothing"
+          alt="Gimma Clothing"
           className="aspect-[16/10] w-full object-cover sm:aspect-[21/9]"
         />
       </div>
