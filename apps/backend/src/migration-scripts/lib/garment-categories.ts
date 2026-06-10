@@ -66,13 +66,15 @@ export function classifyGarmentCategory(title: string): GarmentCategoryHandle {
   if (/catsuit|enterizo/.test(t)) return "bodies-enterizos"
   if (/\bbody\b/.test(t) || t.startsWith("body ")) return "bodies-enterizos"
   if (/vestido/.test(t)) return "vestidos"
-  if (/buzo|campera|camperita|piluso|ruana|chomba|sweater|saco/.test(t)) {
-    return "buzos-abrigos"
-  }
   if (/palazo|calza|pantalon/.test(t)) return "pantalones-calzas"
   if (/short|pollera|\bmini\b/.test(t)) return "shorts-polleras"
-  if (/remera|musculosa|top|manga larga|polera|bufand|pupera/.test(t)) {
+  if (
+    /remera|musculosa|top|manga|polera|bufand|pupera|tul|polera/.test(t)
+  ) {
     return "tops-remeras"
+  }
+  if (/buzo|campera|camperita|piluso|ruana|chomba|sweater|saco/.test(t)) {
+    return "buzos-abrigos"
   }
 
   return "otros"
