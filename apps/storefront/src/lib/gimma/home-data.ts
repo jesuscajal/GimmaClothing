@@ -6,6 +6,8 @@ export type HomeSlide = {
   title: string[]
   titleColors: string[]
   image: string
+  /** Si está definido, "Ver colección" filtra la tienda por esta categoría. */
+  collectionCategory?: string
 }
 
 const SLIDE_COPY = [
@@ -13,6 +15,7 @@ const SLIDE_COPY = [
     eyebrow: "Nueva colección",
     title: ["OTOÑO", "INVIERNO"],
     titleColors: ["text-[#6B4F3A]", "text-[#C4A882]"],
+    collectionCategory: "buzos-abrigos",
   },
   {
     eyebrow: "Esenciales",
@@ -51,6 +54,16 @@ export function enrichCategoriesWithImages(
   })
 }
 
+function pickAutumnWinterProduct(products: GimmaProduct[]) {
+  return (
+    products.find(
+      (p) =>
+        isCatalogImage(p.image) &&
+        (p.category === "buzos-abrigos" || /buzo/i.test(p.title))
+    ) ?? products.find((p) => isCatalogImage(p.image))
+  )
+}
+
 /** Slides del hero con fotos reales del catálogo. */
 export function buildHomeSlides(products: GimmaProduct[]): HomeSlide[] {
   const withPhoto = products.filter((p) => isCatalogImage(p.image))
@@ -58,7 +71,11 @@ export function buildHomeSlides(products: GimmaProduct[]): HomeSlide[] {
   if (!withPhoto.length) return []
 
   return SLIDE_COPY.map((copy, index) => {
-    const product = withPhoto[index % withPhoto.length]
+    const product =
+      index === 0
+        ? pickAutumnWinterProduct(withPhoto) ?? withPhoto[0]
+        : withPhoto[index % withPhoto.length]
+
     return {
       id: product.id,
       ...copy,

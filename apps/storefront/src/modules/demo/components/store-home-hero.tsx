@@ -14,7 +14,8 @@ const FALLBACK_SLIDES: HomeSlide[] = [
     title: ["OTOÑO", "INVIERNO"],
     titleColors: ["text-[#6B4F3A]", "text-[#C4A882]"],
     image:
-      "https://images.unsplash.com/photo-1483985988355-763728e3685b?w=1200&q=80",
+      "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=1200&q=80",
+    collectionCategory: "buzos-abrigos",
   },
 ]
 
@@ -27,6 +28,9 @@ export default function StoreHomeHero({ basePath, slides }: Props) {
   const items = slides.length ? slides : FALLBACK_SLIDES
   const [active, setActive] = useState(0)
   const slide = items[active]
+  const collectionHref = slide.collectionCategory
+    ? `${gimmaPath(basePath, "tienda")}?categoria=${slide.collectionCategory}`
+    : gimmaPath(basePath, "tienda")
 
   return (
     <section className="relative mx-4 mt-4 overflow-hidden rounded-3xl sm:mx-6">
@@ -60,7 +64,7 @@ export default function StoreHomeHero({ basePath, slides }: Props) {
 
           <div className="flex items-end justify-between">
             <Link
-              href={gimmaPath(basePath, "tienda")}
+              href={collectionHref}
               className="inline-flex items-center gap-2 rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-neutral-800"
             >
               Ver colección
