@@ -1,6 +1,9 @@
 "use client"
 
-import { formatAdminPrice } from "@lib/demo/admin-data"
+import {
+  formatAdminPrice,
+  PRODUCT_STATUS_LABELS,
+} from "@lib/demo/admin-data"
 import { useDemoAdmin } from "@modules/demo/admin/demo-admin-context"
 
 export default function AdminProductsTable() {
@@ -56,7 +59,7 @@ export default function AdminProductsTable() {
                         : "bg-neutral-100 text-neutral-600"
                     }`}
                   >
-                    {p.status}
+                    {PRODUCT_STATUS_LABELS[p.status]}
                   </span>
                 </td>
                 <td className="px-5 py-4">

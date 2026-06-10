@@ -205,6 +205,19 @@ export function formatAdminDate(iso: string) {
   }).format(new Date(iso))
 }
 
+export const CHANNEL_LABELS: Record<DemoOrderChannel, string> = {
+  whatsapp: "WhatsApp",
+  web: "Web",
+}
+
+export const PRODUCT_STATUS_LABELS: Record<
+  DemoAdminProduct["status"],
+  string
+> = {
+  publicado: "Publicado",
+  borrador: "Borrador",
+}
+
 export const STATUS_LABELS: Record<DemoOrderStatus, string> = {
   pendiente: "Pendiente",
   confirmado: "Confirmado",

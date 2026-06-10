@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import {
+  CHANNEL_LABELS,
   formatAdminDate,
   formatAdminPrice,
   STATUS_LABELS,
@@ -56,13 +57,13 @@ export default function AdminOrdersList() {
                 <td className="px-5 py-4 text-neutral-500">{order.phone}</td>
                 <td className="px-5 py-4">
                   <span
-                    className={`rounded px-2 py-0.5 text-xs font-medium capitalize ${
+                    className={`rounded px-2 py-0.5 text-xs font-medium ${
                       order.channel === "whatsapp"
                         ? "bg-emerald-50 text-emerald-700"
                         : "bg-blue-50 text-blue-700"
                     }`}
                   >
-                    {order.channel}
+                    {CHANNEL_LABELS[order.channel]}
                   </span>
                 </td>
                 <td className="px-5 py-4">

@@ -15,7 +15,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <h1 className="text-2xl font-semibold text-neutral-900">Dashboard</h1>
+      <h1 className="text-2xl font-semibold text-neutral-900">Panel</h1>
       <p className="mt-1 text-sm text-neutral-500">
         Resumen de Gimma Clothing · demo interactivo
       </p>

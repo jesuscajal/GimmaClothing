@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import {
+  CHANNEL_LABELS,
   formatAdminDate,
   formatAdminPrice,
   NEXT_ORDER_ACTION,
@@ -67,7 +68,8 @@ export default function AdminOrderDetail({ orderId }: { orderId: string }) {
             Pedido {order.displayId}
           </h1>
           <p className="mt-1 text-sm text-neutral-500">
-            {formatAdminDate(order.createdAt)} · Canal {order.channel}
+            {formatAdminDate(order.createdAt)} · Canal{" "}
+            {CHANNEL_LABELS[order.channel]}
             {order.stockDeducted && (
               <span className="ml-2 text-emerald-700">· Stock descontado</span>
             )}

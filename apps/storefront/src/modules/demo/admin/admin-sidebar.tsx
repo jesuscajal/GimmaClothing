@@ -7,7 +7,7 @@ import { useDemoAdmin } from "@modules/demo/admin/demo-admin-context"
 import clsx from "clsx"
 
 const NAV = [
-  { href: "/demo/admin", label: "Dashboard" },
+  { href: "/demo/admin", label: "Panel" },
   { href: "/demo/admin/pedidos", label: "Pedidos" },
   { href: "/demo/admin/productos", label: "Productos" },
   { href: "/demo/admin/inventario", label: "Inventario" },
@@ -26,7 +26,7 @@ export default function AdminSidebar() {
           <div>
             <p className="text-sm font-medium text-white">Gimma Clothing</p>
             <p className="text-[10px] tracking-wide text-neutral-500 uppercase">
-              Admin
+              Administración
             </p>
           </div>
         </Link>

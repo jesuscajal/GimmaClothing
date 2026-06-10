@@ -31,39 +31,39 @@ const STORE_SCREENS = [
 const ADMIN_SCREENS = [
   {
     href: "/demo/admin",
-    title: "Dashboard",
+    title: "Panel",
     description: "Métricas, pedidos recientes y alertas de stock",
-    tag: "Admin",
+    tag: "Administración",
   },
   {
     href: "/demo/admin/pedidos",
     title: "Pedidos",
     description: "Listado con canal WhatsApp/web y estados",
-    tag: "Admin",
+    tag: "Administración",
   },
   {
     href: "/demo/admin/pedidos/ord-001",
     title: "Detalle de pedido",
     description: "Ítems, cliente y botón responder por WhatsApp",
-    tag: "Admin",
+    tag: "Administración",
   },
   {
     href: "/demo/admin/productos",
     title: "Productos",
     description: "Catálogo, precios, stock y estados",
-    tag: "Admin",
+    tag: "Administración",
   },
   {
     href: "/demo/admin/inventario",
     title: "Inventario",
     description: "Stock por SKU y alertas",
-    tag: "Admin",
+    tag: "Administración",
   },
   {
     href: "/demo/admin/clientes",
     title: "Clientes",
     description: "Historial y contacto",
-    tag: "Admin",
+    tag: "Administración",
   },
 ]
 

@@ -41,7 +41,7 @@ export default function AdminInventoryTable() {
           <thead>
             <tr className="border-b border-neutral-100 bg-neutral-50 text-left text-neutral-500">
               <th className="px-5 py-3 font-medium">Producto</th>
-              <th className="px-5 py-3 font-medium">SKU</th>
+              <th className="px-5 py-3 font-medium">Código</th>
               <th className="px-5 py-3 font-medium">Disponible</th>
               <th className="px-5 py-3 font-medium">Estado</th>
             </tr>
@@ -62,7 +62,7 @@ export default function AdminInventoryTable() {
                   ) : p.stock < 12 ? (
                     <span className="text-amber-600">Bajo</span>
                   ) : (
-                    <span className="text-emerald-600">OK</span>
+                    <span className="text-emerald-600">Disponible</span>
                   )}
                 </td>
               </tr>
