@@ -17,10 +17,15 @@ hash_lock() {
 }
 
 install_deps_if_needed() {
+  if [ "${SKIP_DEPS:-}" = "1" ]; then
+    echo "==> Dependencias: omitidas (SKIP_DEPS=1)"
+    return 0
+  fi
+
   local current previous
   current="$(hash_lock)"
   previous=""
-  [ -f "$LOCK_MARKER" ] && previous="$(cat "$LOCK_MARKER")"
+  [ -f "$LOCK_MARKER" ] && previous="$(tr -d '[:space:]' < "$LOCK_MARKER")"
 
   if [ "$current" = "$previous" ] && [ -d node_modules ]; then
     echo "==> Dependencias: sin cambios (omitido)"
@@ -32,7 +37,7 @@ install_deps_if_needed() {
     echo "    npm ci falló, usando npm install..."
     npm install
   fi
-  echo "$current" > "$LOCK_MARKER"
+  printf '%s\n' "$current" > "$LOCK_MARKER"
 }
 
 echo "==> Git pull..."

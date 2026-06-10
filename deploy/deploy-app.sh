@@ -17,7 +17,7 @@ sed -i 's/\r$//' deploy/*.sh 2>/dev/null || true
 LOCK_MARKER="$ROOT/.deploy-package-lock.sha256"
 CURRENT_LOCK=$(sha256sum package-lock.json 2>/dev/null | awk '{print $1}')
 PREVIOUS_LOCK=""
-[ -f "$LOCK_MARKER" ] && PREVIOUS_LOCK=$(cat "$LOCK_MARKER")
+[ -f "$LOCK_MARKER" ] && PREVIOUS_LOCK=$(tr -d '[:space:]' < "$LOCK_MARKER")
 
 if [ "$CURRENT_LOCK" = "$PREVIOUS_LOCK" ] && [ -d node_modules ]; then
   echo "==> Dependencias: sin cambios (omitido, ~15 min ahorrados)"
@@ -27,7 +27,7 @@ else
     echo "    npm ci falló, usando npm install..."
     npm install
   fi
-  echo "$CURRENT_LOCK" > "$LOCK_MARKER"
+  printf '%s\n' "$CURRENT_LOCK" > "$LOCK_MARKER"
 fi
 
 echo "==> Docker (PostgreSQL + Redis)..."
