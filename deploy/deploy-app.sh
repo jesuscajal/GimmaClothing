@@ -14,8 +14,21 @@ git pull origin main || git pull origin master || true
 echo "==> Corregir finales de línea (CRLF) en scripts..."
 sed -i 's/\r$//' deploy/*.sh 2>/dev/null || true
 
-echo "==> Dependencias..."
-npm ci
+LOCK_MARKER="$ROOT/.deploy-package-lock.sha256"
+CURRENT_LOCK=$(sha256sum package-lock.json 2>/dev/null | awk '{print $1}')
+PREVIOUS_LOCK=""
+[ -f "$LOCK_MARKER" ] && PREVIOUS_LOCK=$(cat "$LOCK_MARKER")
+
+if [ "$CURRENT_LOCK" = "$PREVIOUS_LOCK" ] && [ -d node_modules ]; then
+  echo "==> Dependencias: sin cambios (omitido, ~15 min ahorrados)"
+else
+  echo "==> Dependencias: instalando..."
+  if ! npm ci 2>/dev/null; then
+    echo "    npm ci falló, usando npm install..."
+    npm install
+  fi
+  echo "$CURRENT_LOCK" > "$LOCK_MARKER"
+fi
 
 echo "==> Docker (PostgreSQL + Redis)..."
 if [ -f deploy/env/docker.env ]; then
