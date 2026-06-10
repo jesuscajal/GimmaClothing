@@ -22,14 +22,22 @@ export default function GimmaLogo({
   const px = SIZES[size]
 
   const logo = (
-    <Image
-      src="/images/logo-gimma.png"
-      alt="Gimma Clothing"
-      width={px}
-      height={px}
-      className={clsx("shrink-0 object-contain", className)}
-      priority={size === "lg"}
-    />
+    <span
+      className={clsx(
+        "inline-flex shrink-0 overflow-hidden rounded-full",
+        className
+      )}
+      style={{ width: px, height: px }}
+    >
+      <Image
+        src="/images/logo-gimma.png"
+        alt="Gimma Clothing"
+        width={px}
+        height={px}
+        className="h-full w-full rounded-full object-cover"
+        priority={size === "lg"}
+      />
+    </span>
   )
 
   if (!href) return logo
