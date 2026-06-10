@@ -20,6 +20,10 @@ import {
   previewMatches,
   readCatalog,
 } from "./lib/catalog-import"
+import {
+  classifyGarmentCategory,
+  GIMMA_GARMENT_CATEGORIES,
+} from "./lib/garment-categories"
 
 /**
  * Importa catálogo desde Excel/CSV + carpeta de fotos (WhatsApp).
@@ -159,12 +163,30 @@ export default async function importCatalog({
     fields: ["id", "name", "handle"],
   })
 
-  const categoryByName = new Map(
-    categories.map((c: { id: string; name: string }) => [
-      c.name.toLowerCase(),
+  const categoryByHandle = new Map(
+    categories.map((c: { id: string; handle: string }) => [
+      c.handle.toLowerCase(),
       c.id,
     ])
   )
+
+  for (const def of GIMMA_GARMENT_CATEGORIES) {
+    if (categoryByHandle.has(def.handle)) continue
+    const { result } = await createProductCategoriesWorkflow(container).run({
+      input: {
+        product_categories: [
+          {
+            name: def.label,
+            handle: def.handle,
+            description: def.description,
+            is_active: true,
+          },
+        ],
+      },
+    })
+    categoryByHandle.set(def.handle, result[0].id)
+    logger.info(`Categoría de tienda creada: ${def.label}`)
+  }
 
   fs.mkdirSync(publicDir, { recursive: true })
 
@@ -196,24 +218,10 @@ export default async function importCatalog({
 
     const unitPrice = row.precio > 0 ? row.precio : placeholderPrice
 
-    let categoryId: string | undefined
-    const categoria = normalizeCategoryName(row.categoria)
-    if (categoria) {
-      const key = categoria.toLowerCase()
-      categoryId = categoryByName.get(key)
-      if (!categoryId) {
-        const { result } = await createProductCategoriesWorkflow(container).run({
-          input: {
-            product_categories: [
-              { name: categoria, is_active: true },
-            ],
-          },
-        })
-        categoryId = result[0].id
-        categoryByName.set(key, categoryId)
-        logger.info(`Categoría creada: ${categoria}`)
-      }
-    }
+    const productTitle = normalizeProductName(row.nombre)
+    const garmentHandle = classifyGarmentCategory(productTitle)
+    const categoryId = categoryByHandle.get(garmentHandle)
+    const brand = normalizeCategoryName(row.categoria)
 
     const ext = path.extname(photoFile).toLowerCase() || ".jpg"
     const publicName = `${handle}${ext}`
@@ -251,7 +259,7 @@ export default async function importCatalog({
     }
 
     productsToCreate.push({
-      title: normalizeProductName(row.nombre),
+      title: productTitle,
       handle,
       description:
         row.descripcion ||
@@ -259,6 +267,7 @@ export default async function importCatalog({
       status: ProductStatus.PUBLISHED,
       shipping_profile_id: shippingProfile.id,
       category_ids: categoryId ? [categoryId] : undefined,
+      metadata: brand ? { brand } : undefined,
       images: [{ url: imageUrl }],
       options,
       variants,

@@ -25,6 +25,7 @@
     "seed:argentina": "npm run seed:argentina -w @dtc/backend",
     "import:catalog": "npm run import:catalog -w @dtc/backend",
     "fix:quotes": "npm run fix:quotes -w @dtc/backend",
+    "reclassify:categories": "npm run reclassify:categories -w @dtc/backend",
     "prepare:whatsapp": "node import/prepare-whatsapp.mjs",
     "prepare:whatsapp:medusa": "npm run prepare:whatsapp -w @dtc/backend"
   },

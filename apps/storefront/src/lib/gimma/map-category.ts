@@ -3,14 +3,20 @@ import { normalizeGimmaText } from "./normalize-text"
 import { GimmaCategory } from "./types"
 
 const CATEGORY_IMAGES: Record<string, string> = {
-  shirts:
+  vestidos:
+    "https://images.unsplash.com/photo-1595777457583-95e059d581b2?w=800&q=80",
+  "tops-remeras":
     "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80",
-  sweatshirts:
+  "buzos-abrigos":
     "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80",
-  pants:
+  "pantalones-calzas":
     "https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80",
-  merch:
+  "shorts-polleras":
+    "https://images.unsplash.com/photo-1475178626620-a4d074967a7c?w=800&q=80",
+  "bodies-enterizos":
     "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=80",
+  accesorios:
+    "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80",
 }
 
 const DEFAULT_IMAGE =
