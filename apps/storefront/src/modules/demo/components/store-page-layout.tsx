@@ -1,6 +1,9 @@
 import { ReactNode, Suspense } from "react"
 import StorePageBackground from "@modules/demo/components/store-page-background"
 import StorePageIntro from "@modules/demo/components/store-page-intro"
+import StoreProductsScroll, {
+  STORE_PRODUCTS_ANCHOR,
+} from "@modules/demo/components/store-products-scroll"
 
 type Props = {
   productCount: number
@@ -29,8 +32,14 @@ export default function StorePageLayout({
             {filters}
           </Suspense>
         </div>
-        <div className="mt-10 lg:max-w-none">
-          <Suspense fallback={null}>{toolbar}</Suspense>
+        <div
+          id={STORE_PRODUCTS_ANCHOR}
+          className="mt-10 scroll-mt-24 lg:max-w-none"
+        >
+          <Suspense fallback={null}>
+            <StoreProductsScroll />
+            {toolbar}
+          </Suspense>
           <div className="mt-6">{children}</div>
         </div>
       </div>

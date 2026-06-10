@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { Adjustments, ChevronRight } from "@medusajs/icons"
 import { StoreFilterItem } from "@modules/demo/components/store-filters"
+import { STORE_PRODUCTS_ANCHOR } from "@modules/demo/components/store-products-scroll"
 import clsx from "clsx"
 
 type Props = {
@@ -102,7 +103,7 @@ export default function StoreCategoryNav({
       params.delete("categoria")
     }
     const q = params.toString()
-    return `${basePath}/tienda${q ? `?${q}` : ""}`
+    return `${basePath}/tienda${q ? `?${q}` : ""}#${STORE_PRODUCTS_ANCHOR}`
   }
 
   const sorted = [...categories].sort((a, b) =>
