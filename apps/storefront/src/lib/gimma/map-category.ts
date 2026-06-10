@@ -1,4 +1,5 @@
 import { HttpTypes } from "@medusajs/types"
+import { normalizeGimmaText } from "./normalize-text"
 import { GimmaCategory } from "./types"
 
 const CATEGORY_IMAGES: Record<string, string> = {
@@ -17,7 +18,7 @@ const DEFAULT_IMAGE =
 
 /** Quita comillas que vienen del Excel/WhatsApp en nombres de marca. */
 export function normalizeCategoryText(value: string): string {
-  return value.replace(/^["']+|["']+$/g, "").trim()
+  return normalizeGimmaText(value)
 }
 
 export function mapMedusaCategories(

@@ -85,11 +85,26 @@ export function slugify(value: string) {
   return normalizeKey(value).replace(/\s+/g, "-")
 }
 
+/** Limpia comillas del Excel/chat en textos importados. */
+export function stripOuterQuotes(value: string): string {
+  let result = value.trim()
+  while (/^["'""''«»].*["'""''«»]$/.test(result) && result.length > 1) {
+    result = result.slice(1, -1).trim()
+  }
+  return result
+}
+
 /** Limpia comillas del Excel/chat en nombres de categoría/marca. */
 export function normalizeCategoryName(value: string | undefined): string | undefined {
   if (!value) return undefined
-  const cleaned = value.replace(/^["']+|["']+$/g, "").trim()
+  const cleaned = stripOuterQuotes(value)
   return cleaned || undefined
+}
+
+/** Limpia comillas del Excel/chat en nombres de producto. */
+export function normalizeProductName(value: string): string {
+  const cleaned = stripOuterQuotes(value)
+  return cleaned || value
 }
 
 export function parsePrice(raw: unknown): number | null {
@@ -191,7 +206,7 @@ export function readCatalog(filePath: string): CatalogRow[] {
     if (!mapped.nombre) return
 
     rows.push({
-      nombre: mapped.nombre,
+      nombre: normalizeProductName(mapped.nombre),
       precio: mapped.precio ?? 0,
       categoria: normalizeCategoryName(mapped.categoria),
       descripcion: mapped.descripcion,
@@ -351,7 +366,12 @@ export function readPriceList(filePath: string): PriceRow[] {
     }
 
     if (!nombre || precio === null) continue
-    rows.push({ nombre, precio, categoria, raw })
+    rows.push({
+      nombre: normalizeProductName(nombre),
+      precio,
+      categoria: normalizeCategoryName(categoria),
+      raw,
+    })
   }
 
   return rows
@@ -413,7 +433,9 @@ export function whatsAppEntriesToCatalog(
   const usedFiles = new Map<string, string>()
 
   entries.forEach((entry, index) => {
-    const nombre = entry.nombre || `Producto ${entry.file}`
+    const nombre = normalizeProductName(
+      entry.nombre || `Producto ${entry.file}`
+    )
     const hasPhoto = photoSet.has(entry.file.toLowerCase())
 
     if (!entry.nombre) {

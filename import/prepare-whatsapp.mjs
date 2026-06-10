@@ -33,6 +33,14 @@ function normalizeKey(value) {
     .trim()
 }
 
+function stripOuterQuotes(value) {
+  let result = String(value).trim()
+  while (/^["'""''«»].*["'""''«»]$/.test(result) && result.length > 1) {
+    result = result.slice(1, -1).trim()
+  }
+  return result
+}
+
 /** Nombres del chat → términos de búsqueda en el stock */
 function expandWhatsAppName(nombre) {
   const key = normalizeKey(nombre)
@@ -106,7 +114,11 @@ function parseWhatsAppChat(content) {
       }
     }
 
-    entries.push({ file, nombre: nombre.trim(), chatLine: index + 1 })
+    entries.push({
+      file,
+      nombre: stripOuterQuotes(nombre),
+      chatLine: index + 1,
+    })
   })
 
   return entries
@@ -176,7 +188,7 @@ function readGimmaStockCsv(filePath) {
     const row =
       byProduct.get(key) ||
       {
-        nombre: producto.replace(/\s+/g, " ").trim(),
+        nombre: stripOuterQuotes(producto.replace(/\s+/g, " ").trim()),
         precios: [],
         talles: new Set(),
         colores: new Set(),

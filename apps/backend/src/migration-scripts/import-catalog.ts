@@ -16,6 +16,7 @@ import {
   handleFromPhoto,
   listPhotos,
   normalizeCategoryName,
+  normalizeProductName,
   previewMatches,
   readCatalog,
 } from "./lib/catalog-import"
@@ -250,7 +251,7 @@ export default async function importCatalog({
     }
 
     productsToCreate.push({
-      title: row.nombre,
+      title: normalizeProductName(row.nombre),
       handle,
       description:
         row.descripcion ||

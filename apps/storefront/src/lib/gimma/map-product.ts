@@ -1,6 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { normalizeCategoryText } from "./map-category"
+import { normalizeGimmaText } from "./normalize-text"
 import { GimmaProduct } from "./types"
 import { mapGimmaVariants } from "./variants"
 
@@ -72,7 +73,7 @@ export function mapMedusaToGimmaProduct(
   return {
     id: product.id,
     handle: product.handle,
-    title: product.title ?? product.handle,
+    title: normalizeGimmaText(product.title ?? product.handle),
     description: product.description ?? "",
     category: product.categories?.[0]?.handle
       ? normalizeCategoryText(product.categories[0].handle)
