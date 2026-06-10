@@ -32,16 +32,17 @@ export default function StoreToolbar({ productCount, basePath }: Props) {
   }
 
   return (
-    <div className="mb-6 flex items-center justify-between gap-4">
-      <p className="text-sm text-neutral-500">
-        {productCount} producto{productCount !== 1 ? "s" : ""}
+    <div className="flex items-center justify-between gap-4 rounded-2xl bg-white/80 px-4 py-3 shadow-sm backdrop-blur-sm">
+      <p className="text-sm text-neutral-600">
+        <span className="font-semibold text-[#A89578]">{productCount}</span>{" "}
+        producto{productCount !== 1 ? "s" : ""}
       </p>
       <div className="relative">
         <select
           value={currentSort}
           onChange={(e) => onSortChange(e.target.value)}
           aria-label="Ordenar productos"
-          className="appearance-none rounded-lg border border-beige-200 bg-white py-2 pr-9 pl-3 text-sm text-black outline-none transition focus:border-beige-400"
+          className="appearance-none rounded-full border border-neutral-200 bg-white py-2 pr-9 pl-3 text-xs font-medium text-black outline-none transition focus:border-neutral-400"
         >
           {SORT_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
