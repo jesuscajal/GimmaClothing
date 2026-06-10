@@ -13,9 +13,9 @@ export default async function GimmaStoreLayout({ children, params }: Props) {
 
   return (
     <DemoCartProvider storageKey="gimma-store-cart">
-      <div className="flex min-h-screen flex-col bg-neutral-300 text-black antialiased">
+      <div className="flex min-h-screen flex-col text-black antialiased">
         <DemoNav basePath={basePath} />
-        {children}
+        <main className="relative flex-1">{children}</main>
         <DemoFooter basePath={basePath} />
       </div>
     </DemoCartProvider>

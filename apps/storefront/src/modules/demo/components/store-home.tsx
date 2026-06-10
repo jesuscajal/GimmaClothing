@@ -27,12 +27,12 @@ export default function StoreHome({
   basicsImages,
 }: Props) {
   return (
-    <>
+    <div className="bg-neutral-300">
       <StoreHomeHero basePath={basePath} slides={slides} />
       <StoreTrustBar />
       <StoreCategoryCircles categories={categories} basePath={basePath} />
       <StoreFeaturedProducts products={featured} basePath={basePath} />
       <StoreBasicsBanner basePath={basePath} images={basicsImages} />
-    </>
+    </div>
   )
 }

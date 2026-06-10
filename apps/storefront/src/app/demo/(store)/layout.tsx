@@ -7,9 +7,9 @@ export default function DemoStoreLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-neutral-300 text-black antialiased">
+    <div className="flex min-h-screen flex-col text-black antialiased">
       <DemoNav />
-      {children}
+      <main className="relative flex-1">{children}</main>
       <DemoFooter />
     </div>
   )

@@ -16,9 +16,9 @@ export default function StorePageLayout({
   children,
 }: Props) {
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-full flex-1">
       <StorePageBackground />
-      <div className="relative mx-4 pb-12 pt-6 sm:mx-6 lg:mx-auto lg:max-w-6xl">
+      <div className="relative z-10 mx-4 pb-12 pt-6 sm:mx-6 lg:mx-auto lg:max-w-6xl">
         <div className="lg:max-w-2xl">
           <StorePageIntro productCount={productCount} />
           <Suspense
