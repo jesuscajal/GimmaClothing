@@ -4,9 +4,15 @@ import { gimmaPath } from "@lib/gimma/paths"
 
 type Props = {
   basePath: string
+  images: string[]
 }
 
-export default function StoreBasicsBanner({ basePath }: Props) {
+export default function StoreBasicsBanner({ basePath, images }: Props) {
+  const visible = images.slice(0, 3)
+  const main = visible[0]
+
+  if (!main) return null
+
   return (
     <section className="mx-4 mt-10 mb-8 sm:mx-6">
       <div className="relative overflow-hidden rounded-3xl bg-[#D9CCBA]">
@@ -30,20 +36,24 @@ export default function StoreBasicsBanner({ basePath }: Props) {
             </Link>
           </div>
 
-          <div className="relative flex justify-center sm:justify-end">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80"
-              alt="Básicos Gimma"
-              className="h-40 w-auto rounded-2xl object-cover shadow-lg sm:h-52"
-            />
-            <button
-              type="button"
-              aria-label="Agregar a favoritos"
-              className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-sm shadow"
-            >
-              ♡
-            </button>
+          <div className="relative flex items-end justify-center gap-3 sm:justify-end">
+            {visible.map((src, index) => (
+              <div
+                key={src}
+                className="relative overflow-hidden rounded-2xl shadow-lg"
+                style={{
+                  width: index === 0 ? "55%" : "22%",
+                  marginBottom: index === 1 ? "1rem" : index === 2 ? "2rem" : 0,
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={src}
+                  alt="Producto Gimma"
+                  className="aspect-[3/4] w-full object-cover"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>

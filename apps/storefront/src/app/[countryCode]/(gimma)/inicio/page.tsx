@@ -1,6 +1,12 @@
 import { listCategories } from "@lib/data/categories"
 import { listProducts } from "@lib/data/products"
 import {
+  buildHomeSlides,
+  enrichCategoriesWithImages,
+  pickBasicsImages,
+  pickFeaturedProducts,
+} from "@lib/gimma/home-data"
+import {
   categoriesWithProducts,
   mapMedusaCategories,
 } from "@lib/gimma/map-category"
@@ -33,10 +39,21 @@ export default async function GimmaHomePage({ params }: Props) {
   ])
 
   const products = mapMedusaProducts(response.products)
-  const categories = categoriesWithProducts(
-    mapMedusaCategories(rawCategories),
-    products.map((p) => p.category)
+  const categories = enrichCategoriesWithImages(
+    categoriesWithProducts(
+      mapMedusaCategories(rawCategories),
+      products.map((p) => p.category)
+    ),
+    products
   )
 
-  return <StoreHome basePath={basePath} categories={categories} />
+  return (
+    <StoreHome
+      basePath={basePath}
+      categories={categories}
+      slides={buildHomeSlides(products)}
+      featured={pickFeaturedProducts(products, 8)}
+      basicsImages={pickBasicsImages(products)}
+    />
+  )
 }
