@@ -120,27 +120,21 @@ export default function StoreCategoryNav({
       <div className="mb-4 flex items-center gap-2">
         <Adjustments className="h-4 w-4 text-neutral-600" />
         <span className="text-xs font-semibold tracking-[0.2em] text-neutral-700 uppercase">
-          Filtrar
+          Categorías
         </span>
       </div>
 
-      <div className="overflow-hidden rounded-3xl bg-white shadow-sm">
+      <div className="flex flex-col bg-[#E5E5E5] border-r border-[#A3A3A3] py-2 w-full max-w-[280px]">
         <Link
           href={linkFor()}
           className={clsx(
-            "flex items-center gap-4 border-b border-neutral-100 px-5 py-4 transition",
-            !active ? "bg-[#E8DFD3]" : "hover:bg-neutral-50"
+            "px-6 py-3.5 text-xs font-medium uppercase tracking-[0.2em] transition text-left truncate",
+            !active
+              ? "bg-[#D3D3D3] text-black font-semibold"
+              : "text-neutral-700 hover:bg-[#DCDCDC] hover:text-black"
           )}
         >
-          <CategoryIcon id="todos" />
-          <div className="min-w-0 flex-1">
-            <p className="font-medium text-black">Todos</p>
-            <p className="text-xs text-neutral-500">Ver todos los productos</p>
-          </div>
-          <span className="rounded-full bg-neutral-200/80 px-2.5 py-0.5 text-xs font-medium text-neutral-700">
-            {totalCount}
-          </span>
-          <ChevronRight className="h-4 w-4 shrink-0 text-neutral-400" />
+          Todos
         </Link>
 
         {sorted.map((cat) => (
@@ -148,19 +142,17 @@ export default function StoreCategoryNav({
             key={cat.id}
             href={linkFor(cat.id)}
             className={clsx(
-              "flex items-center gap-4 border-b border-neutral-100 px-5 py-4 transition last:border-b-0",
-              active === cat.id ? "bg-[#E8DFD3]" : "hover:bg-neutral-50"
+              "px-6 py-3.5 text-xs font-medium uppercase tracking-[0.2em] transition text-left truncate border-t border-neutral-300/30",
+              active === cat.id
+                ? "bg-[#D3D3D3] text-black font-semibold"
+                : "text-neutral-700 hover:bg-[#DCDCDC] hover:text-black"
             )}
           >
-            <CategoryIcon id={cat.id} />
-            <p className="min-w-0 flex-1 font-medium text-black">{cat.label}</p>
-            <span className="rounded-full bg-neutral-200/80 px-2.5 py-0.5 text-xs font-medium text-neutral-700">
-              {cat.count}
-            </span>
-            <ChevronRight className="h-4 w-4 shrink-0 text-neutral-400" />
+            {cat.label}
           </Link>
         ))}
       </div>
     </nav>
   )
 }
+
