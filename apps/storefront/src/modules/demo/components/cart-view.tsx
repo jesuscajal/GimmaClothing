@@ -10,6 +10,8 @@ import { buildWhatsAppOrderUrl } from "@lib/demo/whatsapp"
 import { useDemoCart } from "@modules/demo/demo-cart-context"
 import { getDemoProduct } from "@lib/demo/data"
 import GimmaCheckoutButton from "@modules/gimma/components/gimma-checkout-button"
+import { createWhatsAppOrder } from "@lib/data/cart"
+
 
 type Props = {
   basePath?: string
@@ -59,23 +61,13 @@ export default function DemoCartView({
     }
 
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-      const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-      const response = await fetch(`${backendUrl}/store/whatsapp-order`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-publishable-api-key": publishableKey,
-        },
-        body: JSON.stringify({ items: checkoutItems }),
-      })
+      const result = await createWhatsAppOrder(checkoutItems)
 
-      if (!response.ok) {
-        throw new Error("Failed to register order on backend")
+      if (!result.success || !result.order) {
+        throw new Error(result.error || "Failed to register order on backend")
       }
 
-      const data = await response.json()
-      const orderDisplayId = data.order.display_id
+      const orderDisplayId = result.order.display_id
 
       const totalFormatted = formatPrice(total)
       const lines = items.map(

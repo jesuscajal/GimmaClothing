@@ -471,3 +471,29 @@ export async function listCartOptions() {
     cache: "force-cache",
   })
 }
+
+export async function createWhatsAppOrder(items: { variantId: string; quantity: number }[]) {
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  try {
+    const response = await sdk.client.fetch<{
+      order: { id: string; display_id: number; total: number }
+    }>(`/store/whatsapp-order`, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: {
+        items,
+      },
+    })
+    return { success: true, order: response.order }
+  } catch (error: any) {
+    console.error("Error in createWhatsAppOrder Server Action:", error)
+    return { success: false, error: error.message || "Unknown error" }
+  }
+}
+
