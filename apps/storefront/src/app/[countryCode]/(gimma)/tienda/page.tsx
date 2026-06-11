@@ -7,7 +7,7 @@ import {
   mapMedusaCategories,
 } from "@lib/gimma/map-category"
 import { mapMedusaProducts } from "@lib/gimma/map-product"
-import DemoProductCard from "@modules/demo/components/product-card"
+import StoreCatalogList from "@modules/demo/components/store-catalog-list"
 import StorePageLayout from "@modules/demo/components/store-page-layout"
 import StoreToolbar from "@modules/demo/components/store-toolbar"
 import GimmaStoreFilters from "@modules/gimma/components/gimma-store-filters"
@@ -18,12 +18,12 @@ const CATALOG_REVALIDATE = 60
 
 type Props = {
   params: Promise<{ countryCode: string }>
-  searchParams: Promise<{ categoria?: string; orden?: string; search?: string }>
+  searchParams: Promise<{ categoria?: string; orden?: string }>
 }
 
 export default async function GimmaStorePage({ params, searchParams }: Props) {
   const { countryCode } = await params
-  const { categoria, orden, search } = await searchParams
+  const { categoria, orden } = await searchParams
   const basePath = `/${countryCode}`
 
   const [{ response }, rawCategories] = await Promise.all([
@@ -46,17 +46,9 @@ export default async function GimmaStorePage({ params, searchParams }: Props) {
   )
   
   // Filtrar por categoría
-  let filtered = categoria
+  const filtered = categoria
     ? products.filter((p) => p.category === categoria)
     : products
-
-  // Filtrar por buscador
-  if (search) {
-    const searchLower = search.toLowerCase()
-    filtered = filtered.filter((p) =>
-      p.title.toLowerCase().includes(searchLower)
-    )
-  }
 
   const sorted = sortProducts(filtered, orden)
 
@@ -80,17 +72,7 @@ export default async function GimmaStorePage({ params, searchParams }: Props) {
         <StoreToolbar productCount={sorted.length} basePath={basePath} />
       }
     >
-      {sorted.length === 0 ? (
-        <p className="text-center text-neutral-500">
-          No hay productos en esta categoría.
-        </p>
-      ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
-          {sorted.map((p) => (
-            <DemoProductCard key={p.id} product={p} basePath={basePath} />
-          ))}
-        </div>
-      )}
+      <StoreCatalogList products={sorted} basePath={basePath} />
     </StorePageLayout>
   )
 }
