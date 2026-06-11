@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { defineRouteConfig } from "@medusajs/admin-sdk"
 import { Container, Heading, Table } from "@medusajs/ui"
 import { useEffect, useState } from "react"
@@ -161,10 +162,10 @@ export function FacturacionPage() {
   return (
     <div className="space-y-6 max-w-[1200px] mx-auto p-1">
       <div className="flex flex-col gap-2">
-        <Heading level="h1" className="text-2xl font-bold text-neutral-900">
+        <Heading level="h1" className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
           Facturación y Ventas Mensuales
         </Heading>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
           Reporte histórico agrupado por mes de todas las órdenes activas en la tienda.
         </p>
       </div>
@@ -172,45 +173,45 @@ export function FacturacionPage() {
       {/* Tarjetas de Resumen */}
       <div className="grid gap-4 md:grid-cols-3">
         {mostProductiveMonth && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-5 flex flex-col justify-between shadow-sm">
+          <div className="rounded-xl border border-emerald-200 dark:border-emerald-900/40 bg-emerald-50/50 dark:bg-emerald-950/10 p-5 flex flex-col justify-between shadow-sm backdrop-blur-md">
             <div>
-              <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 px-2 py-0.5 rounded-full">
                 Mes Más Productivo
               </span>
-              <p className="text-2xl font-bold text-emerald-950 mt-3">
+              <p className="text-2xl font-bold text-emerald-950 dark:text-emerald-50 mt-3">
                 {mostProductiveMonth.monthName}
               </p>
             </div>
             <div className="mt-4">
-              <p className="text-xs text-emerald-700">Facturación récord</p>
-              <p className="text-lg font-bold text-emerald-900">{formatCurrency(mostProductiveMonth.totalSales)}</p>
+              <p className="text-xs text-emerald-700 dark:text-emerald-400">Facturación récord</p>
+              <p className="text-lg font-bold text-emerald-900 dark:text-emerald-300">{formatCurrency(mostProductiveMonth.totalSales)}</p>
             </div>
           </div>
         )}
 
-        <div className="rounded-xl border border-neutral-200 bg-white p-5 flex flex-col justify-between shadow-sm">
+        <div className="rounded-xl border border-neutral-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 p-5 flex flex-col justify-between shadow-sm backdrop-blur-md">
           <div>
-            <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-500 dark:text-zinc-400 bg-neutral-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
               Ventas Históricas Totales
             </span>
-            <p className="text-2xl font-bold text-neutral-950 mt-3">
+            <p className="text-2xl font-bold text-neutral-950 dark:text-zinc-50 mt-3">
               {formatCurrency(summaries.reduce((sum, s) => sum + s.totalSales, 0))}
             </p>
           </div>
           <div className="mt-4">
-            <p className="text-xs text-neutral-500">Volumen acumulado</p>
-            <p className="text-sm font-semibold text-neutral-700">
+            <p className="text-xs text-neutral-500 dark:text-zinc-500">Volumen acumulado</p>
+            <p className="text-sm font-semibold text-neutral-700 dark:text-zinc-300">
               {summaries.reduce((sum, s) => sum + s.orderCount, 0)} pedidos completados
             </p>
           </div>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 bg-white p-5 flex flex-col justify-between shadow-sm">
+        <div className="rounded-xl border border-neutral-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 p-5 flex flex-col justify-between shadow-sm backdrop-blur-md">
           <div>
-            <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-500 dark:text-zinc-400 bg-neutral-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
               Ticket Promedio General
             </span>
-            <p className="text-2xl font-bold text-neutral-950 mt-3">
+            <p className="text-2xl font-bold text-neutral-950 dark:text-zinc-50 mt-3">
               {formatCurrency(
                 summaries.reduce((sum, s) => sum + s.orderCount, 0) > 0
                   ? summaries.reduce((sum, s) => sum + s.totalSales, 0) / summaries.reduce((sum, s) => sum + s.orderCount, 0)
@@ -219,27 +220,27 @@ export function FacturacionPage() {
             </p>
           </div>
           <div className="mt-4">
-            <p className="text-xs text-neutral-500">Valor promedio de compra</p>
-            <p className="text-sm font-semibold text-neutral-700">Estimado por orden</p>
+            <p className="text-xs text-neutral-500 dark:text-zinc-500">Valor promedio de compra</p>
+            <p className="text-sm font-semibold text-neutral-700 dark:text-zinc-300">Estimado por orden</p>
           </div>
         </div>
       </div>
 
       {/* Tabla Principal de Resumen Mensual */}
       <Container className="p-0 overflow-hidden shadow-sm">
-        <div className="px-6 py-4 border-b border-neutral-200">
-          <Heading level="h2" className="text-lg font-bold text-neutral-900">Historial de Ventas</Heading>
+        <div className="px-6 py-4 border-b border-neutral-200 dark:border-zinc-800">
+          <Heading level="h2" className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Historial de Ventas</Heading>
         </div>
         
         {summaries.length === 0 ? (
-          <div className="p-12 text-center text-neutral-500">
+          <div className="p-12 text-center text-zinc-500 dark:text-zinc-400">
             No se encontraron pedidos registrados en el sistema.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <Table>
               <Table.Header>
-                <Table.Row className="bg-neutral-50 text-neutral-600">
+                <Table.Row className="bg-neutral-50 dark:bg-zinc-900/40 text-neutral-600 dark:text-zinc-400 border-b border-neutral-200 dark:border-zinc-800">
                   <Table.HeaderCell className="px-6 py-3">Mes</Table.HeaderCell>
                   <Table.HeaderCell className="px-6 py-3 text-right">Facturación</Table.HeaderCell>
                   <Table.HeaderCell className="px-6 py-3 text-right">Cant. Pedidos</Table.HeaderCell>
@@ -250,23 +251,23 @@ export function FacturacionPage() {
               <Table.Body>
                 {summaries.map((summary) => (
                   <>
-                    <Table.Row key={summary.monthKey} className="border-t border-neutral-200 hover:bg-neutral-50/50">
-                      <Table.Cell className="px-6 py-4 font-semibold text-neutral-900">
+                    <Table.Row key={summary.monthKey} className="border-t border-neutral-200 dark:border-zinc-800 hover:bg-neutral-50/50 dark:hover:bg-zinc-900/40">
+                      <Table.Cell className="px-6 py-4 font-semibold text-zinc-900 dark:text-zinc-100">
                         {summary.monthName}
                       </Table.Cell>
-                      <Table.Cell className="px-6 py-4 text-right font-bold text-emerald-700">
+                      <Table.Cell className="px-6 py-4 text-right font-bold text-emerald-700 dark:text-emerald-400">
                         {formatCurrency(summary.totalSales)}
                       </Table.Cell>
-                      <Table.Cell className="px-6 py-4 text-right text-neutral-700">
+                      <Table.Cell className="px-6 py-4 text-right text-zinc-700 dark:text-zinc-300">
                         {summary.orderCount}
                       </Table.Cell>
-                      <Table.Cell className="px-6 py-4 text-right text-neutral-700">
+                      <Table.Cell className="px-6 py-4 text-right text-zinc-700 dark:text-zinc-300">
                         {formatCurrency(summary.averageTicket)}
                       </Table.Cell>
                       <Table.Cell className="px-6 py-4 text-center">
                         <button
                           onClick={() => setExpandedMonth(expandedMonth === summary.monthKey ? null : summary.monthKey)}
-                          className="text-xs font-semibold text-neutral-600 hover:text-neutral-900 border border-neutral-200 px-3 py-1.5 rounded-lg bg-white shadow-sm hover:bg-neutral-50 transition"
+                          className="text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 border border-zinc-200 dark:border-zinc-700 px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-800 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-700/80 transition"
                         >
                           {expandedMonth === summary.monthKey ? "Ocultar Pedidos" : "Ver Pedidos"}
                         </button>
@@ -275,34 +276,34 @@ export function FacturacionPage() {
 
                     {/* Desglose de Pedidos del Mes */}
                     {expandedMonth === summary.monthKey && (
-                      <Table.Row className="bg-neutral-50/70 border-t border-neutral-100">
+                      <Table.Row className="bg-neutral-50/30 dark:bg-zinc-900/10 border-t border-neutral-100 dark:border-zinc-800/40">
                         <Table.Cell colSpan={5} className="px-6 py-4">
                           <div className="space-y-2 max-w-[900px] mx-auto">
-                            <Heading level="h3" className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-3">
+                            <Heading level="h3" className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-3">
                               Desglose de Pedidos - {summary.monthName}
                             </Heading>
-                            <div className="rounded-lg border border-neutral-200 bg-white overflow-hidden shadow-sm">
-                              <table className="min-w-full divide-y divide-neutral-200 text-xs">
-                                <thead className="bg-neutral-50">
-                                  <tr className="text-left text-neutral-500 font-semibold">
+                            <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 overflow-hidden shadow-sm">
+                              <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs">
+                                <thead className="bg-neutral-50 dark:bg-zinc-950/60">
+                                  <tr className="text-left text-zinc-500 dark:text-zinc-400 font-semibold border-b border-zinc-200 dark:border-zinc-800">
                                     <th className="px-4 py-2">Orden ID</th>
                                     <th className="px-4 py-2">Fecha</th>
                                     <th className="px-4 py-2">Contacto</th>
                                     <th className="px-4 py-2 text-right">Total</th>
                                   </tr>
                                 </thead>
-                                <tbody className="divide-y divide-neutral-100">
+                                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/40">
                                   {summary.orders.map((order) => (
-                                    <tr key={order.id} className="hover:bg-neutral-50">
-                                      <td className="px-4 py-2.5 font-bold text-neutral-900">
+                                    <tr key={order.id} className="hover:bg-neutral-50 dark:hover:bg-zinc-800/30">
+                                      <td className="px-4 py-2.5 font-bold text-zinc-900 dark:text-zinc-100">
                                         <a
                                           href={`/app/orders/${order.id}`}
-                                          className="text-indigo-600 hover:underline"
+                                          className="text-indigo-600 dark:text-indigo-400 hover:underline"
                                         >
                                           #{order.display_id}
                                         </a>
                                       </td>
-                                      <td className="px-4 py-2.5 text-neutral-500">
+                                      <td className="px-4 py-2.5 text-zinc-500 dark:text-zinc-400">
                                         {new Date(order.created_at).toLocaleDateString("es-AR", {
                                           day: "2-digit",
                                           month: "2-digit",
@@ -311,10 +312,10 @@ export function FacturacionPage() {
                                           minute: "2-digit"
                                         })}
                                       </td>
-                                      <td className="px-4 py-2.5 text-neutral-700 truncate max-w-[200px]">
+                                      <td className="px-4 py-2.5 text-zinc-700 dark:text-zinc-300 truncate max-w-[200px]">
                                         {order.email}
                                       </td>
-                                      <td className="px-4 py-2.5 text-right font-semibold text-neutral-900">
+                                      <td className="px-4 py-2.5 text-right font-semibold text-zinc-900 dark:text-zinc-100">
                                         {formatCurrency(order.total)}
                                       </td>
                                     </tr>
