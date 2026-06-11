@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { ChevronUpDown } from "@medusajs/icons"
+import { useStoreSearch } from "./store-search-context"
 
 const SORT_OPTIONS = [
   { value: "recientes", label: "Más recientes" },
@@ -19,6 +20,12 @@ export default function StoreToolbar({ productCount, basePath }: Props) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const currentSort = searchParams.get("orden") ?? "recientes"
+
+  const { searchQuery, isFocused } = useStoreSearch()
+  const searchActive = isFocused || searchQuery.trim().length > 0
+
+  if (searchActive) return null
+
 
   const onSortChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString())

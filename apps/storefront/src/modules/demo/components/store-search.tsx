@@ -1,9 +1,28 @@
 "use client"
 
 import { useStoreSearch } from "./store-search-context"
+import { scrollToStoreProducts } from "./store-products-scroll"
 
 export default function StoreSearch() {
   const { searchQuery, setSearchQuery, setIsFocused } = useStoreSearch()
+
+  const handleFocus = () => {
+    setIsFocused(true)
+    setTimeout(scrollToStoreProducts, 100)
+  }
+
+  const handleChange = (val: string) => {
+    setSearchQuery(val)
+    setTimeout(scrollToStoreProducts, 50)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Escape") {
+      setSearchQuery("")
+      setIsFocused(false)
+      e.currentTarget.blur()
+    }
+  }
 
   return (
     <div className="relative w-full max-w-[280px]">
@@ -11,9 +30,10 @@ export default function StoreSearch() {
         <input
           type="text"
           value={searchQuery}
-          onFocus={() => setIsFocused(true)}
+          onFocus={handleFocus}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleChange(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Buscar productos..."
           className="w-full rounded-full border border-beige-200 bg-beige-50/50 py-2 pl-10 pr-10 text-sm text-black placeholder-neutral-400 outline-none transition-all focus:border-beige-400 focus:bg-white focus:ring-1 focus:ring-beige-300"
         />
@@ -35,7 +55,7 @@ export default function StoreSearch() {
         {searchQuery && (
           <button
             type="button"
-            onClick={() => setSearchQuery("")}
+            onClick={() => handleChange("")}
             className="absolute right-3 p-1 rounded-full text-neutral-400 hover:bg-beige-100 hover:text-neutral-600 transition"
             aria-label="Limpiar búsqueda"
           >
@@ -48,3 +68,4 @@ export default function StoreSearch() {
     </div>
   )
 }
+

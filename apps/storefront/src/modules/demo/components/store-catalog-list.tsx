@@ -14,12 +14,32 @@ export default function StoreCatalogList({ products, basePath }: Props) {
   const searchActive = isFocused || searchQuery.trim().length > 0
 
   if (searchActive) {
-    const searchLower = searchQuery.toLowerCase().trim()
-    const filtered = searchLower
-      ? products.filter((p) => p.title.toLowerCase().includes(searchLower))
+    const cleanString = (str: string) =>
+      str
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+
+    const searchClean = cleanString(searchQuery)
+    const searchTerms = searchClean.split(/\s+/).filter(Boolean)
+
+    const filtered = searchTerms.length > 0
+      ? products.filter((p) => {
+          const titleClean = cleanString(p.title || "")
+          const descClean = cleanString(p.description || "")
+          const catClean = cleanString(p.category || "")
+
+          // Check if every search term matches at least one of title, description, or category
+          return searchTerms.every(
+            (term) =>
+              titleClean.includes(term) ||
+              descClean.includes(term) ||
+              catClean.includes(term)
+          )
+        })
       : []
 
-    if (!searchLower) {
+    if (searchTerms.length === 0) {
       return (
         <div className="py-20 text-center animate-fade-in">
           <p className="text-lg text-neutral-500 font-serif">Comenzá a escribir para buscar prendas...</p>

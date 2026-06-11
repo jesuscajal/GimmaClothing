@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation"
 import { Adjustments, ChevronRight } from "@medusajs/icons"
 import { StoreFilterItem } from "@modules/demo/components/store-filters"
 import { STORE_PRODUCTS_ANCHOR } from "@modules/demo/components/store-products-scroll"
+import { useStoreSearch } from "@modules/demo/components/store-search-context"
 import clsx from "clsx"
 
 type Props = {
@@ -94,6 +95,10 @@ export default function StoreCategoryNav({
   active,
 }: Props) {
   const searchParams = useSearchParams()
+  const { searchQuery, isFocused } = useStoreSearch()
+  const searchActive = isFocused || searchQuery.trim().length > 0
+
+  if (searchActive) return null
 
   const linkFor = (cat?: string) => {
     const params = new URLSearchParams(searchParams.toString())
