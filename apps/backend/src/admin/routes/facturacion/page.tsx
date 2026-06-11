@@ -29,6 +29,8 @@ type OrderData = {
   currency_code: string
   status: string
   email: string
+  payment_status: string
+  payment_collections?: any[]
 }
 
 type MonthSummary = {
@@ -56,6 +58,21 @@ function formatMonthKey(dateStr: string): { key: string; label: string } {
   }
 }
 
+function getPaymentCaptureDate(order: any): string {
+  if (order.payment_collections && Array.isArray(order.payment_collections)) {
+    for (const pc of order.payment_collections) {
+      if (pc.payments && Array.isArray(pc.payments)) {
+        for (const p of pc.payments) {
+          if (p.captured_at) {
+            return p.captured_at
+          }
+        }
+      }
+    }
+  }
+  return order.created_at
+}
+
 export function FacturacionPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -68,20 +85,33 @@ export function FacturacionPage() {
       try {
         setLoading(true)
         // Buscamos las órdenes en el endpoint de Medusa Admin (la cookie de sesión ya está en el navegador)
-        const response = await fetch("/admin/orders?limit=999")
+        const response = await fetch(
+          "/admin/orders?limit=999&fields=id,status,created_at,email,display_id,payment_status,total,currency_code,*payment_collections,*payment_collections.payments"
+        )
         if (!response.ok) {
           throw new Error("No se pudo obtener el listado de pedidos de la tienda.")
         }
         const data = await response.json()
         const ordersList: OrderData[] = data.orders || []
 
-        // Filtrar órdenes que no estén canceladas
-        const activeOrders = ordersList.filter(o => o.status !== "canceled")
+        // Filtrar órdenes que tengan el pago capturado y no estén canceladas
+        const activeOrders = ordersList.filter(o => {
+          if (o.status === "canceled") return false
+          
+          // Consideramos el pago capturado si payment_status es "captured" o "completed",
+          // o si alguna de sus colecciones de pago está "completed".
+          const isPaid = o.payment_status === "captured" || 
+                         o.payment_status === "completed" || 
+                         (o.payment_collections && o.payment_collections.some((pc: any) => pc.status === "completed"))
+                         
+          return isPaid
+        })
 
-        // Agrupar por mes
+        // Agrupar por mes usando la fecha de captura del pago
         const groups: Record<string, { label: string; orders: OrderData[] }> = {}
         activeOrders.forEach(order => {
-          const { key, label } = formatMonthKey(order.created_at)
+          const captureDate = getPaymentCaptureDate(order)
+          const { key, label } = formatMonthKey(captureDate)
           if (!groups[key]) {
             groups[key] = { label, orders: [] }
           }
@@ -287,7 +317,7 @@ export function FacturacionPage() {
                                 <thead className="bg-neutral-50 dark:bg-zinc-950/60">
                                   <tr className="text-left text-zinc-500 dark:text-zinc-400 font-semibold border-b border-zinc-200 dark:border-zinc-800">
                                     <th className="px-4 py-2">Orden ID</th>
-                                    <th className="px-4 py-2">Fecha</th>
+                                    <th className="px-4 py-2">Fecha Pago</th>
                                     <th className="px-4 py-2">Contacto</th>
                                     <th className="px-4 py-2 text-right">Total</th>
                                   </tr>
@@ -304,7 +334,7 @@ export function FacturacionPage() {
                                         </a>
                                       </td>
                                       <td className="px-4 py-2.5 text-zinc-500 dark:text-zinc-400">
-                                        {new Date(order.created_at).toLocaleDateString("es-AR", {
+                                        {new Date(getPaymentCaptureDate(order)).toLocaleDateString("es-AR", {
                                           day: "2-digit",
                                           month: "2-digit",
                                           year: "numeric",
