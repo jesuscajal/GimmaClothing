@@ -40,7 +40,7 @@ export default function DemoCartView({
 
   const handleWhatsAppClick = async () => {
     if (isDemo) {
-      window.open(whatsappUrl, "_blank")
+      window.location.href = whatsappUrl
       return
     }
 
@@ -91,7 +91,7 @@ export default function DemoCartView({
       const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
 
       clearCart()
-      window.open(waUrl, "_blank")
+      window.location.href = waUrl
     } catch (err) {
       console.error(err)
       setOrderError("Hubo un problema al registrar tu pedido. Por favor intentá de nuevo.")
