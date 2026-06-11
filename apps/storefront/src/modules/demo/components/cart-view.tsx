@@ -1,9 +1,11 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
-import { formatDemoPrice } from "@lib/demo/data"
+import { formatDemoPrice, DEMO_WHATSAPP } from "@lib/demo/data"
 import { formatGimmaPrice } from "@lib/gimma/format-price"
 import { gimmaPath } from "@lib/gimma/paths"
+import { gimmaConfig } from "@lib/gimma/config"
 import { buildWhatsAppOrderUrl } from "@lib/demo/whatsapp"
 import { useDemoCart } from "@modules/demo/demo-cart-context"
 import { getDemoProduct } from "@lib/demo/data"
@@ -23,12 +25,88 @@ export default function DemoCartView({
   enableShipping = false,
 }: Props) {
   const { items, updateQuantity, removeItem, clearCart } = useDemoCart()
+  const [loadingOrder, setLoadingOrder] = useState(false)
+  const [orderError, setOrderError] = useState<string | null>(null)
 
   const formatPrice = (amount: number) =>
     currency ? formatGimmaPrice(amount, currency) : formatDemoPrice(amount)
 
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
   const whatsappUrl = buildWhatsAppOrderUrl(items)
+
+  const isDemo = basePath === "/demo"
+
+  const handleWhatsAppClick = async () => {
+    if (isDemo) {
+      window.open(whatsappUrl, "_blank")
+      return
+    }
+
+    setLoadingOrder(true)
+    setOrderError(null)
+
+    const checkoutItems = items
+      .filter((i) => i.variantId)
+      .map((i) => ({
+        variant_id: i.variantId!,
+        quantity: i.quantity,
+      }))
+
+    if (!checkoutItems.length) {
+      setOrderError("No hay productos válidos en el carrito para procesar.")
+      setLoadingOrder(false)
+      return
+    }
+
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+      const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
+      const response = await fetch(`${backendUrl}/store/whatsapp-order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-publishable-api-key": publishableKey,
+        },
+        body: JSON.stringify({ items: checkoutItems }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to register order on backend")
+      }
+
+      const data = await response.json()
+      const orderDisplayId = data.order.display_id
+
+      const totalFormatted = formatPrice(total)
+      const lines = items.map(
+        (i) =>
+          `• ${i.title} (${i.color}, talle ${i.size}) x${i.quantity} — ${formatPrice(i.price * i.quantity)}`
+      )
+      
+      const message = [
+        "Hola Gimma Clothing! 👋",
+        `*Pedido registrado en la web: #${orderDisplayId}*`,
+        "Quiero hacer este pedido:",
+        "",
+        ...lines,
+        "",
+        `*Total: ${totalFormatted}*`,
+        "",
+        "¿Cómo puedo proceder con el pago y coordinar el envío?",
+      ].join("\n")
+
+      const whatsappNumber = gimmaConfig.whatsapp || DEMO_WHATSAPP
+      const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+
+      clearCart()
+      window.open(waUrl, "_blank")
+    } catch (err) {
+      console.error(err)
+      setOrderError("Hubo un problema al registrar tu pedido. Por favor intentá de nuevo.")
+    } finally {
+      setLoadingOrder(false)
+    }
+  }
 
   if (!items.length) {
     return (
@@ -169,20 +247,32 @@ export default function DemoCartView({
           </span>
         </div>
 
-        <a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-8 flex w-full items-center justify-center gap-2 rounded-lg bg-beige-800 py-4 text-sm font-medium text-white transition hover:bg-beige-900"
+        <button
+          type="button"
+          onClick={handleWhatsAppClick}
+          disabled={loadingOrder}
+          className="mt-8 flex w-full items-center justify-center gap-2 rounded-lg bg-beige-800 py-4 text-sm font-medium text-white transition hover:bg-beige-900 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-          </svg>
-          Pedir por WhatsApp
-        </a>
+          {loadingOrder ? (
+            <span>Registrando pedido...</span>
+          ) : (
+            <>
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+              Pedir por WhatsApp
+            </>
+          )}
+        </button>
+
+        {orderError && (
+          <p className="mt-2 text-center text-xs text-red-600">
+            {orderError}
+          </p>
+        )}
 
         <p className="mt-4 text-center text-xs text-neutral-500">
-          Se abrirá WhatsApp con el detalle del pedido
+          Se abrirá WhatsApp con el detalle del pedido y su número de referencia
         </p>
 
         {enableShipping && countryCode && (

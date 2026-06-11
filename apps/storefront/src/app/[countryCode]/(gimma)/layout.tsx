@@ -12,7 +12,7 @@ export default async function GimmaStoreLayout({ children, params }: Props) {
   const basePath = `/${countryCode}`
 
   return (
-    <DemoCartProvider storageKey="gimma-store-cart">
+    <DemoCartProvider storageKey="gimma-store-cart" basePath={basePath} countryCode={countryCode}>
       <div className="flex min-h-screen flex-col text-black antialiased">
         <DemoNav basePath={basePath} />
         <main className="relative flex-1">{children}</main>
