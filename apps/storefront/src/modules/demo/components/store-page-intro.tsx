@@ -1,3 +1,5 @@
+import StoreSearch from "./store-search"
+
 type Props = {
   title?: string
   productCount: number
@@ -9,9 +11,12 @@ export default function StorePageIntro({
 }: Props) {
   return (
     <header className="relative">
-      <h1 className="font-serif text-5xl font-semibold tracking-tight text-black sm:text-6xl">
-        {title}
-      </h1>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="font-serif text-5xl font-semibold tracking-tight text-black sm:text-6xl">
+          {title}
+        </h1>
+        {title === "Tienda" && <StoreSearch />}
+      </div>
 
       <div className="mt-4 flex items-center gap-3">
         <span className="h-px flex-1 max-w-[120px] bg-neutral-400/50" />

@@ -6,14 +6,25 @@ import StorePageLayout from "@modules/demo/components/store-page-layout"
 import StoreToolbar from "@modules/demo/components/store-toolbar"
 
 type Props = {
-  searchParams: Promise<{ categoria?: string; orden?: string }>
+  searchParams: Promise<{ categoria?: string; orden?: string; search?: string }>
 }
 
 export default async function DemoStorePage({ searchParams }: Props) {
-  const { categoria, orden } = await searchParams
-  const filtered = categoria
+  const { categoria, orden, search } = await searchParams
+  
+  // Filtrar por categoría
+  let filtered = categoria
     ? DEMO_PRODUCTS.filter((p) => p.category === categoria)
     : DEMO_PRODUCTS
+
+  // Filtrar por buscador
+  if (search) {
+    const searchLower = search.toLowerCase()
+    filtered = filtered.filter((p) =>
+      p.title.toLowerCase().includes(searchLower)
+    )
+  }
+
   const sorted = sortProducts(filtered, orden)
 
   const filterCategories = countByCategory(DEMO_PRODUCTS, DEMO_CATEGORIES)

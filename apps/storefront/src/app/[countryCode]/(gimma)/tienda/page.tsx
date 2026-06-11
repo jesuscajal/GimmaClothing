@@ -18,12 +18,12 @@ const CATALOG_REVALIDATE = 60
 
 type Props = {
   params: Promise<{ countryCode: string }>
-  searchParams: Promise<{ categoria?: string; orden?: string }>
+  searchParams: Promise<{ categoria?: string; orden?: string; search?: string }>
 }
 
 export default async function GimmaStorePage({ params, searchParams }: Props) {
   const { countryCode } = await params
-  const { categoria, orden } = await searchParams
+  const { categoria, orden, search } = await searchParams
   const basePath = `/${countryCode}`
 
   const [{ response }, rawCategories] = await Promise.all([
@@ -44,9 +44,20 @@ export default async function GimmaStorePage({ params, searchParams }: Props) {
     mapMedusaCategories(rawCategories),
     products.map((p) => p.category)
   )
-  const filtered = categoria
+  
+  // Filtrar por categoría
+  let filtered = categoria
     ? products.filter((p) => p.category === categoria)
     : products
+
+  // Filtrar por buscador
+  if (search) {
+    const searchLower = search.toLowerCase()
+    filtered = filtered.filter((p) =>
+      p.title.toLowerCase().includes(searchLower)
+    )
+  }
+
   const sorted = sortProducts(filtered, orden)
 
   const filterCategories = countByCategory(
