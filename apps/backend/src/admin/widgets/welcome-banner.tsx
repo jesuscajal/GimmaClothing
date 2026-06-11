@@ -1,6 +1,45 @@
+import { useEffect } from "react"
 import { defineWidgetConfig } from "@medusajs/admin-sdk"
 
 function WelcomeBannerWidget() {
+  useEffect(() => {
+    const hideDefaultMedusaElements = () => {
+      const headings = Array.from(document.querySelectorAll("h1, h2, h3"))
+      const medusaHeading = headings.find(
+        (h) =>
+          h.textContent?.includes("Bienvenido a Medusa") ||
+          h.textContent?.includes("Welcome to Medusa")
+      )
+
+      if (medusaHeading) {
+        // Ocultar el título principal de Medusa
+        ;(medusaHeading as HTMLElement).style.display = "none"
+
+        // Ocultar la descripción justo debajo del título
+        const desc = medusaHeading.nextElementSibling
+        if (
+          desc &&
+          (desc.tagName === "P" ||
+            desc.textContent?.includes("Inicia sesión") ||
+            desc.textContent?.includes("Sign in"))
+        ) {
+          ;(desc as HTMLElement).style.display = "none"
+        }
+
+        // Ocultar el logo de Medusa arriba del título
+        const logo = medusaHeading.previousElementSibling
+        if (logo) {
+          ;(logo as HTMLElement).style.display = "none"
+        }
+      }
+    }
+
+    hideDefaultMedusaElements()
+    // Ejecutarlo periódicamente por si el DOM se actualiza dinámicamente
+    const interval = setInterval(hideDefaultMedusaElements, 100)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <div className="flex flex-col items-center justify-center text-center pb-6 select-none">
       <img
@@ -20,6 +59,7 @@ function WelcomeBannerWidget() {
     </div>
   )
 }
+
 
 export const config = defineWidgetConfig({
   zone: "login.before",
