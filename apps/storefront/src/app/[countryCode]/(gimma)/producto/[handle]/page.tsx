@@ -7,6 +7,7 @@ import { mapMedusaProducts, mapMedusaToGimmaProduct } from "@lib/gimma/map-produ
 import { gimmaPath } from "@lib/gimma/paths"
 import GimmaProductActions from "@modules/gimma/components/gimma-product-actions"
 import DemoProductCard from "@modules/demo/components/product-card"
+import ProductImageGallery from "@modules/gimma/components/product-image-gallery"
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
@@ -54,29 +55,11 @@ export default async function GimmaProductPage({ params }: Props) {
       </nav>
 
       <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-        <div className="flex flex-col gap-3">
-          <div className="aspect-[3/4] overflow-hidden rounded-xl bg-beige-100">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={product.image}
-              alt={product.title}
-              className="h-full w-full object-cover"
-            />
-          </div>
-          {product.images.length > 1 && (
-            <div className="grid grid-cols-4 gap-2">
-              {product.images.map((img, i) => (
-                <div
-                  key={i}
-                  className="aspect-square overflow-hidden rounded-lg bg-beige-100"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img} alt="" className="h-full w-full object-cover" />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <ProductImageGallery
+          images={product.images}
+          title={product.title}
+          defaultImage={product.image}
+        />
 
         <div>
           {product.badge && (
