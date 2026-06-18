@@ -3,8 +3,8 @@ import { GimmaCategory, GimmaProduct } from "./types"
 export type HomeSlide = {
   id: string
   eyebrow: string
-  title: string[]
-  titleColors: string[]
+  title: readonly string[]
+  titleColors: readonly string[]
   image: string
   /** Si está definido, "Ver colección" filtra la tienda por esta categoría. */
   collectionCategory?: string
@@ -14,8 +14,8 @@ const SLIDE_COPY = [
   {
     eyebrow: "Nueva colección",
     title: ["OTOÑO", "INVIERNO"],
-    titleColors: ["text-[#6B4F3A]", "text-[#C4A882]"],
-    collectionCategory: "buzos-abrigos",
+    titleColors: ["text-[#6B4F3A]", "text-[#7A1E2E]"],
+    collectionCategory: "vestidos",
   },
   {
     eyebrow: "Esenciales",
@@ -59,7 +59,7 @@ function pickAutumnWinterProduct(products: GimmaProduct[]) {
     products.find(
       (p) =>
         isCatalogImage(p.image) &&
-        (p.category === "buzos-abrigos" || /buzo/i.test(p.title))
+        (p.category === "vestidos" || /vestido/i.test(p.title))
     ) ?? products.find((p) => isCatalogImage(p.image))
   )
 }

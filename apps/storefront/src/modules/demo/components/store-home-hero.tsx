@@ -12,10 +12,10 @@ const FALLBACK_SLIDES: HomeSlide[] = [
     id: "fallback-1",
     eyebrow: "Nueva colección",
     title: ["OTOÑO", "INVIERNO"],
-    titleColors: ["text-[#6B4F3A]", "text-[#C4A882]"],
+    titleColors: ["text-[#6B4F3A]", "text-[#7A1E2E]"],
     image:
       "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=1200&q=80",
-    collectionCategory: "buzos-abrigos",
+    collectionCategory: "vestidos",
   },
 ]
 
